@@ -1,0 +1,162 @@
+{%- comment -%}
+  A comic strip built from blocks: used for the Origin Story page.
+  Each "Panel" block is an image + caption box + speech balloon.
+  Each "Character" block is a character card (art, name, role, bio).
+{%- endcomment -%}
+{{ 'section-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="section comic-strip">
+  <div class="container">
+    <header class="comic-strip__header">
+      {%- if section.settings.kicker != blank -%}
+        <p class="caption-box">{{ section.settings.kicker | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        {%- if section.settings.heading_is_h1 -%}
+          <h1 class="comic-strip__title">{{ section.settings.heading | escape }}</h1>
+        {%- else -%}
+          <h2 class="comic-strip__title">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      {%- endif -%}
+    </header>
+
+    <ol class="comic-grid comic-strip__grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'panel' -%}
+            <li class="strip-panel strip-panel--{{ block.settings.size }}" data-reveal {{ block.shopify_attributes }}>
+              <figure class="panel panel--{{ block.settings.color }} strip-panel__frame">
+                {%- if block.settings.image != blank -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 1400
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '360, 540, 720, 1000, 1400',
+                      sizes: '(min-width: 990px) 600px, 100vw',
+                      class: 'strip-panel__image'
+                  }}
+                {%- else -%}
+                  <div class="strip-panel__placeholder speed-lines" aria-hidden="true">
+                    <span class="burst">{{ 'general.placeholder_art' | t }}</span>
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.caption != blank -%}
+                  <figcaption class="caption-box strip-panel__caption">{{ block.settings.caption | escape }}</figcaption>
+                {%- endif -%}
+                {%- if block.settings.balloon != blank -%}
+                  <p class="balloon strip-panel__balloon strip-panel__balloon--{{ block.settings.balloon_position }}{% if block.settings.balloon_position == 'right' %} balloon--right{% endif %}">
+                    {{- block.settings.balloon | escape -}}
+                  </p>
+                {%- endif -%}
+              </figure>
+            </li>
+
+          {%- when 'character' -%}
+            <li class="strip-panel strip-panel--wide" data-reveal {{ block.shopify_attributes }}>
+              <article class="panel character-card">
+                <div class="character-card__art speed-lines">
+                  {%- if block.settings.image != blank -%}
+                    {{
+                      block.settings.image
+                      | image_url: width: 900
+                      | image_tag:
+                        loading: 'lazy',
+                        widths: '300, 500, 700, 900',
+                        sizes: '(min-width: 750px) 320px, 100vw',
+                        alt: block.settings.name
+                    }}
+                  {%- else -%}
+                    <span class="burst" aria-hidden="true">?</span>
+                  {%- endif -%}
+                </div>
+                <div class="character-card__info">
+                  {%- if block.settings.role != blank -%}
+                    <p class="caption-box">{{ block.settings.role | escape }}</p>
+                  {%- endif -%}
+                  <h3 class="character-card__name">{{ block.settings.name | escape }}</h3>
+                  <div class="rte">{{ block.settings.bio }}</div>
+                </div>
+              </article>
+            </li>
+        {%- endcase -%}
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Comic strip",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Label", "default": "Origin story" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "How Noviko got inked" },
+    { "type": "checkbox", "id": "heading_is_h1", "label": "This is the page's main heading", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Panel",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Art" },
+        { "type": "text", "id": "caption", "label": "Caption box" },
+        { "type": "text", "id": "balloon", "label": "Speech balloon" },
+        {
+          "type": "select",
+          "id": "balloon_position",
+          "label": "Balloon position",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "right"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Panel size",
+          "options": [
+            { "value": "normal", "label": "Normal" },
+            { "value": "wide", "label": "Wide (full row)" },
+            { "value": "tall", "label": "Tall" }
+          ],
+          "default": "normal"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Background",
+          "options": [
+            { "value": "paper", "label": "Paper" },
+            { "value": "yellow", "label": "Yellow" },
+            { "value": "cyan", "label": "Cyan" },
+            { "value": "magenta", "label": "Magenta" },
+            { "value": "violet", "label": "Violet" }
+          ],
+          "default": "paper"
+        }
+      ]
+    },
+    {
+      "type": "character",
+      "name": "Character",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Character art" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Character name" },
+        { "type": "text", "id": "role", "label": "Role", "default": "The hero" },
+        { "type": "richtext", "id": "bio", "label": "Bio", "default": "<p>Short character bio goes here.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comic strip",
+      "blocks": [
+        { "type": "panel", "settings": { "caption": "It started with a sketchbook…", "size": "wide" } },
+        { "type": "panel", "settings": { "balloon": "What if the comic was the clothes?" } },
+        { "type": "panel", "settings": { "caption": "One print later…", "color": "cyan" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

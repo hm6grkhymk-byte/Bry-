@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-issue",
+      "settings": {
+        "fallback_number": 1,
+        "club_heading": "Don't miss the next issue",
+        "club_text": "<p>Fan club members get early access to every drop.</p>"
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -179,6 +179,132 @@
     window.setTimeout(() => el.remove(), 2000); // safety net
   }
 
+  /* ---------- Issue reader: panels reveal one at a time ---------- */
+
+  function initReveal(root = document) {
+    const items = $$('[data-reveal]:not(.is-revealed)', root);
+    if (!items.length) return;
+    if (reducedMotion.matches || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
+    const queue = [];
+    let timer = null;
+    const flush = () => {
+      const el = queue.shift();
+      if (!el) { timer = null; return; }
+      el.classList.add('is-revealed');
+      timer = window.setTimeout(flush, 140);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        queue.push(entry.target);
+      });
+      if (!timer) flush();
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    items.forEach((el) => {
+      observer.observe(el);
+      // Keyboard users never land on an invisible panel.
+      el.addEventListener('focusin', () => el.classList.add('is-revealed'), { once: true });
+    });
+  }
+
+  /* ---------- Product page: option chips pick the variant ---------- */
+
+  function initVariantPicker(picker) {
+    const data = $('[data-variants]', picker);
+    const form = document.getElementById(picker.dataset.form);
+    if (!data || !form) return;
+    const variants = JSON.parse(data.textContent);
+    const select = $('select[name="id"]', form);
+    const button = $('[data-add-button]', form);
+    const section = picker.closest('[data-product-section]') || document;
+    const fieldsets = $$('[data-option-index]', picker);
+
+    const selected = () => fieldsets.map((fs) => {
+      const input = $('input:checked', fs);
+      return input ? input.value : null;
+    });
+
+    function markAvailability(current) {
+      fieldsets.forEach((fs, index) => {
+        $$('input', fs).forEach((input) => {
+          const candidate = current.slice();
+          candidate[index] = input.value;
+          const match = variants.find((v) => v.options.every((value, i) => value === candidate[i]));
+          input.closest('.chip').classList.toggle('chip--unavailable', !match || !match.available);
+        });
+      });
+    }
+
+    function update() {
+      const current = selected();
+      fieldsets.forEach((fs, index) => {
+        const label = $('[data-option-value]', fs);
+        if (label) label.textContent = current[index] || '';
+      });
+      markAvailability(current);
+
+      const variant = variants.find((v) => v.options.every((value, i) => value === current[i]));
+      if (!variant) {
+        button.disabled = true;
+        button.textContent = button.dataset.unavailableText;
+        return;
+      }
+      if (select) select.value = variant.id;
+      button.disabled = !variant.available;
+      button.textContent = variant.available ? button.dataset.addText : button.dataset.soldOutText;
+      const price = $('[data-price]', section);
+      if (price && variant.price_html) price.outerHTML = variant.price_html;
+      if (picker.dataset.url) {
+        const url = new URL(picker.dataset.url, window.location.origin);
+        url.searchParams.set('variant', variant.id);
+        window.history.replaceState({}, '', url.pathname + url.search);
+      }
+      if (variant.media_id) {
+        const slide = document.getElementById(`Media-${picker.dataset.section}-${variant.media_id}`);
+        if (slide) slide.parentElement.scrollTo({ left: slide.offsetLeft, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+      }
+    }
+
+    picker.addEventListener('change', update);
+    markAvailability(selected());
+  }
+
+  /* ---------- Product gallery: thumbnails + active state ---------- */
+
+  function initGallery(gallery) {
+    const track = $('[data-gallery-track]', gallery);
+    const thumbs = $$('[data-gallery-thumb]', gallery);
+    if (!track || !thumbs.length) return;
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const slide = document.getElementById(thumb.dataset.galleryThumb);
+        if (slide) track.scrollTo({ left: slide.offsetLeft, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+      });
+    });
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        thumbs.forEach((t) => t.setAttribute('aria-current', String(t.dataset.galleryThumb === entry.target.id)));
+      });
+    }, { root: track, threshold: 0.6 });
+    $$('[data-gallery-slide]', track).forEach((slide) => observer.observe(slide));
+  }
+
+  /* ---------- Longbox filters apply as soon as they change ---------- */
+
+  function initFilters(form) {
+    let timer = null;
+    form.addEventListener('change', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => form.requestSubmit ? form.requestSubmit() : form.submit(), 350);
+    });
+  }
+
   /* ---------- Event wiring ---------- */
 
   document.addEventListener('click', (event) => {
@@ -235,7 +361,20 @@
     if (event.detail && event.detail.sectionId === SECTION_ID) openStash();
   });
 
-  // Expose for later sections (issue reader, product page).
+  function init(root = document) {
+    initReveal(root);
+    $$('[data-variant-picker]', root).forEach(initVariantPicker);
+    $$('[data-gallery]', root).forEach(initGallery);
+    $$('[data-filter-form]', root).forEach(initFilters);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => init());
+  else init();
+
+  // Theme editor: re-run when a section is added or changed.
+  document.addEventListener('shopify:section:load', (event) => init(event.target));
+
+  // Expose for other scripts.
   config.stash = { open: openStash, close: closeStash, add: addToStash };
   window.Noviko = config;
 })();

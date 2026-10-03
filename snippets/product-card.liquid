@@ -1,37 +1,55 @@
 {%- comment -%}
-  Basic product card. Becomes the "longbox" card in build step 5.
-  Params: product (required), position (optional: 1 and 2 load right away, the rest lazy-load)
+  Product card for the longbox grid.
+  Params:
+  - product (required)
+  - position (optional): cards 1 and 2 load their image right away, the rest lazy-load
+  - id_prefix (optional): when given, shows one-tap "Add to stash" under the card
+  - heading (optional): 'h2' or 'h3' (default) so headings stay in order on the page
 {%- endcomment -%}
-<article class="panel product-card-panel">
-  <a href="{{ product.url }}" class="product-card">
-    <div class="product-card__media">
-      {%- if product.featured_media -%}
-        {%- liquid
-          assign loading = 'lazy'
-          if position and position <= 2
-            assign loading = 'eager'
-          endif
-        -%}
-        {{
-          product.featured_media
-          | image_url: width: 800
-          | image_tag:
-            loading: loading,
-            widths: '300, 450, 600, 800',
-            sizes: '(min-width: 990px) 380px, 50vw',
-            alt: product.featured_media.alt | default: product.title
-        }}
-      {%- else -%}
-        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-      {%- endif -%}
-    </div>
-    <div class="product-card__info">
-      <h3 class="product-card__title">{{ product.title | escape }}</h3>
-      {%- if product.available -%}
-        {% render 'price', product: product %}
-      {%- else -%}
-        <p class="price">{{ 'products.sold_out' | t }}</p>
-      {%- endif -%}
-    </div>
+{%- liquid
+  assign heading_tag = heading | default: 'h3'
+  assign loading = 'lazy'
+  if position and position <= 2
+    assign loading = 'eager'
+  endif
+
+  assign issue_number = nil
+  for c in product.collections
+    if c.template_suffix == 'issue'
+      assign issue_number = c.metafields.custom.issue_number.value | default: 1
+      break
+    endif
+  endfor
+-%}
+<article class="panel product-card">
+  <a href="{{ product.url }}" class="product-card__media" tabindex="-1" aria-hidden="true">
+    {%- if product.featured_media -%}
+      {{
+        product.featured_media
+        | image_url: width: 800
+        | image_tag:
+          loading: loading,
+          widths: '300, 450, 600, 800',
+          sizes: '(min-width: 990px) 380px, 50vw',
+          alt: ''
+      }}
+    {%- else -%}
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+    {%- if issue_number -%}
+      <span class="product-card__badge">#{{ issue_number }}</span>
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="product-card__sold-out sold-out-tag">{{ 'products.sold_out' | t }}</span>
+    {%- endunless -%}
   </a>
+  <div class="product-card__info">
+    <{{ heading_tag }} class="product-card__title"><a href="{{ product.url }}">{{ product.title | escape }}</a></{{ heading_tag }}>
+    {% render 'price', product: product %}
+    {%- if id_prefix and product.available -%}
+      <div class="product-card__add">
+        {% render 'quick-add', product: product, id_prefix: id_prefix, compact: true %}
+      </div>
+    {%- endif -%}
+  </div>
 </article>

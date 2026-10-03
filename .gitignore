@@ -1,4 +1,4 @@
 node_modules/
 .DS_Store
 .shopify/
-preview/out/
+tools/preview/out/

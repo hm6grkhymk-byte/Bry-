@@ -15,7 +15,7 @@
           <ul class="comic-grid" role="list">
             {%- for item in search.results -%}
               {%- if item.object_type == 'product' -%}
-                <li>{% render 'product-card', product: item %}</li>
+                <li>{% render 'product-card', product: item, heading: 'h2' %}</li>
               {%- else -%}
                 <li class="panel"><a class="product-card__info product-card__title" href="{{ item.url }}">{{ item.title | escape }}</a></li>
               {%- endif -%}

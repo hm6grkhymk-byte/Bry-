@@ -1,0 +1,48 @@
+{%- comment -%} Big fan club signup: the Fan Club page, or anywhere on the home page. {%- endcomment -%}
+{{ 'section-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="section fan-club">
+  <div class="container">
+    <div class="panel panel--violet fan-club__panel">
+      <div class="fan-club__copy">
+        {%- if section.settings.kicker != blank -%}
+          <p class="caption-box">{{ section.settings.kicker | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading_is_h1 -%}
+          <h1 class="fan-club__title">{{ section.settings.heading | escape }}</h1>
+        {%- else -%}
+          <h2 class="fan-club__title">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="rte fan-club__text">{{ section.settings.text }}</div>
+        {%- endif -%}
+        {%- assign club_id = 'FanClub-' | append: section.id -%}
+        {% render 'fan-club-form', form_id: club_id %}
+        {%- if section.settings.fine_print != blank -%}
+          <p class="fan-club__fine">{{ section.settings.fine_print | escape }}</p>
+        {%- endif -%}
+      </div>
+      <p class="burst fan-club__burst" aria-hidden="true">{{ section.settings.burst | escape }}</p>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Fan club signup",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Label", "default": "Fan club" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Get every issue first" },
+    { "type": "checkbox", "id": "heading_is_h1", "label": "This is the page's main heading", "default": false },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<ul><li>Early access to every new issue</li><li>First look at sealed covers</li><li>Members-only drops</li></ul>"
+    },
+    { "type": "text", "id": "burst", "label": "Burst sticker", "default": "Join free!" },
+    { "type": "text", "id": "fine_print", "label": "Fine print", "default": "No spam. Unsubscribe any time." }
+  ],
+  "presets": [{ "name": "Fan club signup" }]
+}
+{% endschema %}

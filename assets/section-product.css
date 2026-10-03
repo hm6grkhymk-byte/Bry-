@@ -1,0 +1,268 @@
+/* ==========================================================================
+   Panel close-up (product page)
+   ========================================================================== */
+
+.closeup {
+  padding: var(--space-4) 0 var(--space-7);
+}
+
+/* Breadcrumbs */
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.breadcrumbs li + li::before {
+  content: '›';
+  margin-right: var(--space-2);
+}
+
+.closeup__layout {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 990px) {
+  .closeup__layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .closeup__media {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+/* ---------- Gallery: zooms in like opening a panel ---------- */
+.closeup__media {
+  min-width: 0;
+  animation: panel-zoom 520ms var(--ease-pop) both;
+}
+
+@keyframes panel-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.82) rotate(-2deg);
+    clip-path: inset(12% 12% 12% 12%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(-20px -20px -20px -20px);
+  }
+}
+
+.closeup__track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  background: var(--paper);
+}
+
+.closeup__track::-webkit-scrollbar {
+  display: none;
+}
+
+.closeup__slide {
+  flex: 0 0 100%;
+  aspect-ratio: 4 / 5;
+  scroll-snap-align: start;
+  background: var(--paper);
+}
+
+.closeup__slide img,
+.closeup__slide svg,
+.closeup__slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.closeup__thumbs {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.closeup__thumb {
+  display: block;
+  width: 64px;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  overflow: hidden;
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  opacity: 0.6;
+}
+
+.closeup__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.closeup__thumb[aria-current='true'] {
+  opacity: 1;
+  box-shadow: 3px 3px 0 var(--magenta);
+}
+
+/* ---------- Info ---------- */
+.closeup__info {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  min-width: 0;
+}
+
+.closeup__info > .caption-box {
+  justify-self: start;
+}
+
+.closeup__title {
+  margin: 0;
+  font-size: clamp(1.9rem, 7vw, 3rem);
+}
+
+.closeup__info .price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.closeup__form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.variant-picker {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.variant-picker__option {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.variant-picker__legend {
+  display: block;
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-weight: 700;
+}
+
+.chip--unavailable span {
+  color: #6b6b6b;
+  background: repeating-linear-gradient(-45deg, var(--paper) 0 6px, #e6e6e6 6px 8px);
+  text-decoration: line-through;
+}
+
+.chip--unavailable input:checked + span {
+  background: repeating-linear-gradient(-45deg, var(--magenta) 0 6px, #ff8fbf 6px 8px);
+  color: var(--ink);
+}
+
+.closeup__add {
+  min-height: 60px;
+  font-size: 1.2rem;
+}
+
+.size-chart summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.size-chart summary::-webkit-details-marker {
+  display: none;
+}
+
+.size-chart__body {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.size-chart__body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.size-chart__body th,
+.size-chart__body td {
+  padding: var(--space-2);
+  border: 2px solid var(--ink);
+  text-align: center;
+}
+
+.size-chart__body th {
+  background: var(--yellow);
+}
+
+/* Story caption from the issue */
+.closeup__story {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.closeup__story-art {
+  flex: 0 0 96px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: var(--line-thin) solid var(--ink);
+}
+
+.closeup__story-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.closeup__story-text {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.closeup__story-link {
+  font-weight: 700;
+}
+
+.closeup__description {
+  padding-top: var(--space-2);
+}
+
+/* Express checkout button */
+.closeup__form .shopify-payment-button__button {
+  border-radius: 0;
+  border: var(--line) solid var(--ink);
+  min-height: 52px;
+}
+
+/* More from this issue */
+.closeup__more {
+  margin-top: var(--space-8);
+}
+
+.closeup__more-title {
+  text-transform: uppercase;
+}

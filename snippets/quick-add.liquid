@@ -1,0 +1,66 @@
+{%- comment -%}
+  One-tap "Add to stash" form used on issue panels and longbox cards.
+  - One variant: just the button.
+  - One option (e.g. Size) with up to 10 values: size chips, then the button.
+  - Anything else: a dropdown, then the button.
+  Works without JavaScript (posts to /cart); with JavaScript it adds via AJAX,
+  fires the sound-effect burst and opens the stash drawer.
+
+  Params:
+  - product (required)
+  - id_prefix (required): unique per section, e.g. section.id
+  - compact (optional): smaller layout for grid cards
+{%- endcomment -%}
+{%- liquid
+  assign form_id = 'QuickAdd-' | append: id_prefix | append: '-' | append: product.id
+  assign first_available = product.first_available_variant
+-%}
+{%- if product.available -%}
+  {%- form 'product', product, id: form_id, class: 'quick-add', data-stash-form: '' -%}
+    {%- if product.has_only_default_variant -%}
+      <input type="hidden" name="id" value="{{ first_available.id }}">
+    {%- elsif product.options.size == 1 and product.variants.size <= 10 -%}
+      <fieldset class="chips{% if compact %} chips--compact{% endif %}">
+        <legend class="visually-hidden">{{ 'products.choose_option' | t: option: product.options.first }}</legend>
+        {%- for variant in product.variants -%}
+          <label class="chip">
+            <input
+              type="radio"
+              name="id"
+              value="{{ variant.id }}"
+              required
+              {% unless variant.available %}
+                disabled
+              {% endunless %}
+            >
+            <span>{{ variant.title | escape }}</span>
+          </label>
+        {%- endfor -%}
+      </fieldset>
+    {%- else -%}
+      {%- assign option_names = product.options | join: ' / ' -%}
+      <label class="visually-hidden" for="{{ form_id }}-variant">{{ 'products.choose_option' | t: option: option_names }}</label>
+      <select id="{{ form_id }}-variant" name="id" class="field field--small">
+        {%- for variant in product.variants -%}
+          <option
+            value="{{ variant.id }}"
+            {% if variant == first_available %}
+              selected
+            {% endif %}
+            {% unless variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {{ variant.title | escape }}
+          </option>
+        {%- endfor -%}
+      </select>
+    {%- endif -%}
+    <button type="submit" name="add" class="btn btn--primary btn--block{% if compact %} btn--small{% endif %}">
+      {{ 'products.add_to_stash' | t }}
+    </button>
+    <p class="form-error" role="alert" data-stash-error></p>
+  {%- endform -%}
+{%- else -%}
+  <p class="sold-out-tag">{{ 'products.sold_out' | t }}</p>
+{%- endif -%}

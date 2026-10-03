@@ -45,14 +45,28 @@
     "regular_price": "Regular price",
     "sale_price": "Sale price",
     "from_price": "From {{ price }}",
-    "choose_option": "Choose {{ option }}"
+    "choose_option": "Choose {{ option }}",
+    "size_chart": "Size chart",
+    "more_from_issue": "More from Issue #{{ number }}",
+    "read_in_issue": "Read this panel in Issue #{{ number }}",
+    "gallery": "Product photos",
+    "show_image": "Show photo {{ number }}"
   },
   "collections": {
     "empty": "No gear in this box yet. Check back soon.",
     "product_count": {
       "one": "{{ count }} product",
       "other": "{{ count }} products"
-    }
+    },
+    "longbox": "The longbox",
+    "by_issue": "Shop by issue",
+    "filter_sort": "Filter & sort",
+    "sort_by": "Sort by",
+    "apply": "Apply",
+    "clear": "Clear all",
+    "remove_filter": "Remove filter: {{ label }}",
+    "price_from": "From",
+    "price_to": "To"
   },
   "newsletter": {
     "label": "Email address",
@@ -104,5 +118,35 @@
     "previous": "Previous page",
     "next": "Next page",
     "page": "Page {{ number }}"
+  },
+  "issues": {
+    "issue_label": "Issue #{{ number }}",
+    "panel_label": "Panel {{ number }}",
+    "panels": {
+      "one": "{{ count }} panel",
+      "other": "{{ count }} panels"
+    },
+    "read": "Read Issue #{{ number }}",
+    "sealed": "Sealed",
+    "notify": "Notify me",
+    "notify_text": "Get an email the second Issue #{{ number }} drops.",
+    "notify_submit": "Notify me",
+    "sealed_message": "This issue is still sealed. Join the list and we'll tell you the second it drops.",
+    "start_reading": "Start reading",
+    "skip_to_shop": "Just shopping? Open the longbox",
+    "to_be_continued": "To be continued…",
+    "next_issue": "Next: Issue #{{ number }}",
+    "none": "No issues yet. Create a collection, choose the \"issue\" template for it, and it will show up here."
+  },
+  "breadcrumbs": {
+    "label": "Breadcrumb"
+  },
+  "contact": {
+    "name": "Name",
+    "email": "Email",
+    "order": "Order number (optional)",
+    "message": "Message",
+    "send": "Send it",
+    "success": "Message received! We'll get back to you soon."
   }
 }

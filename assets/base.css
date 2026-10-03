@@ -236,6 +236,7 @@ ul[role='list'] {
   padding: var(--space-2) var(--space-3);
   background: var(--yellow);
   border: var(--line-thin) solid var(--ink);
+  color: var(--ink);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.95rem;
@@ -428,6 +429,107 @@ img.misregister {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 3px;
+}
+
+/* ---------- Size chips + quick add ---------- */
+.btn--small {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.9rem;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.quick-add {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.chip {
+  position: relative;
+  cursor: pointer;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.chip span {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.chips--compact .chip span {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  font-size: 0.9rem;
+}
+
+.chip:hover span {
+  background: var(--yellow);
+}
+
+.chip input:checked + span {
+  background: var(--magenta);
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+
+.chip input:focus-visible + span {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--ink);
+}
+
+.chip input:disabled + span {
+  color: #6b6b6b;
+  background: repeating-linear-gradient(-45deg, var(--paper) 0 6px, #e6e6e6 6px 8px);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.sold-out-tag {
+  display: inline-block;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+
+.field--small {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.95rem;
+}
+
+/* JS / no-JS helpers */
+.js .no-js-only,
+.no-js .js-only {
+  display: none !important;
 }
 
 /* ---------- Forms ---------- */
@@ -957,6 +1059,17 @@ img.misregister {
   padding: var(--space-5);
 }
 
+/* Pages that already have a big signup don't repeat it in the footer. */
+body:has(.fan-club, .issue-end, .issue-sealed) .site-footer__block--fan-club {
+  display: none;
+}
+
+@media (min-width: 750px) {
+  body:has(.fan-club, .issue-end, .issue-sealed) .site-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .site-footer__heading {
   font-size: 1.25rem;
   text-transform: uppercase;
@@ -1029,7 +1142,7 @@ img.misregister {
   .page-panel { padding: var(--space-7); }
 }
 
-/* ---------- Product card + grid (basic; upgraded in later build steps) ---------- */
+/* ---------- Product card ---------- */
 .product-card {
   display: flex;
   flex-direction: column;
@@ -1038,6 +1151,8 @@ img.misregister {
 }
 
 .product-card__media {
+  position: relative;
+  display: block;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-bottom: var(--line) solid var(--ink);
@@ -1049,17 +1164,65 @@ img.misregister {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+a.product-card__media:hover img {
+  transform: scale(1.04);
+}
+
+.product-card__badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 2px var(--space-2);
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+}
+
+.product-card__sold-out {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-3);
 }
 
 .product-card__info {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  flex: 1;
   padding: var(--space-3);
 }
 
 .product-card__title {
-  margin: 0 0 var(--space-1);
+  margin: 0;
   font-family: var(--font-display);
   font-size: 0.95rem;
   line-height: 1.2;
+}
+
+.product-card__title a {
+  text-decoration: none;
+}
+
+.product-card__title a:hover {
+  text-decoration: underline;
+}
+
+.product-card__add {
+  margin-top: auto;
+  padding-top: var(--space-1);
+}
+
+.comic-grid > li {
+  display: flex;
+  min-width: 0;
+}
+
+.comic-grid > li > .panel {
+  width: 100%;
 }
 
 .price {

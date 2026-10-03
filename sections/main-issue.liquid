@@ -1,0 +1,204 @@
+{%- comment -%}
+  Issue reader: a collection read as a scrolling comic. Each product is a panel.
+  Used by templates/collection.issue.json — pick the "issue" template on a collection.
+
+  Product metafields (Settings › Custom data › Products):
+  - custom.panel_caption (Multi-line text)  the story caption for this panel
+  - custom.panel_art     (File: image)      the panel illustration (falls back to the product photo)
+  Collection metafields: see sections/main-issue-picker.liquid.
+{%- endcomment -%}
+{{ 'section-issues.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign number = collection.metafields.custom.issue_number.value | default: section.settings.fallback_number
+  assign status = collection.metafields.custom.issue_status.value | default: 'open' | downcase | strip
+  assign issue_label = 'issues.issue_label' | t: number: number
+  assign next_number = number | plus: 1
+  assign next_issue = nil
+  for c in collections
+    if c.template_suffix == 'issue' and c.metafields.custom.issue_number.value == next_number
+      assign next_issue = c
+      break
+    endif
+  endfor
+-%}
+
+<section class="issue" aria-labelledby="IssueTitle-{{ section.id }}">
+  <header class="issue-splash container">
+    <div class="issue-splash__cover panel{% if status == 'sealed' %} polybag{% endif %}">
+      {%- if collection.featured_image -%}
+        {{
+          collection.featured_image
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '400, 600, 800, 1000, 1200',
+            sizes: '(min-width: 990px) 440px, 80vw',
+            alt: collection.featured_image.alt | default: collection.title
+        }}
+      {%- else -%}
+        <div class="issue-tile__placeholder speed-lines">
+          <span class="burst">{{ issue_label }}</span>
+        </div>
+      {%- endif -%}
+      {%- if status == 'sealed' -%}
+        <span class="polybag__tape" aria-hidden="true">{{ 'issues.sealed' | t }}</span>
+      {%- endif -%}
+    </div>
+
+    <div class="issue-splash__info">
+      <p class="caption-box">{{ issue_label }}</p>
+      <h1 id="IssueTitle-{{ section.id }}" class="issue-splash__title">{{ collection.title | escape }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="issue-splash__intro caption-box caption-box--long rte">{{ collection.description }}</div>
+      {%- endif -%}
+      {%- if status != 'sealed' and collection.products_count > 0 -%}
+        <div class="issue-splash__actions">
+          <a href="#Panel-1" class="btn btn--primary">{{ 'issues.start_reading' | t }} ↓</a>
+          <a href="{{ routes.all_products_collection_url }}" class="issue-splash__skip">{{ 'issues.skip_to_shop' | t }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+  </header>
+
+  {%- if status == 'sealed' -%}
+    <div class="container">
+      <div class="panel panel--violet issue-sealed">
+        <p class="issue-sealed__text">{{ 'issues.sealed_message' | t }}</p>
+        {%- assign notify_tags = 'newsletter, fan-club, notify-' | append: collection.handle -%}
+        {%- assign notify_label = 'issues.notify_submit' | t -%}
+        {%- assign notify_id = 'Notify-' | append: section.id -%}
+        {% render 'fan-club-form', form_id: notify_id, tags: notify_tags, button_label: notify_label %}
+      </div>
+    </div>
+  {%- else -%}
+    {%- paginate collection.products by 50 -%}
+      <ol class="issue-page container" role="list" data-issue-page>
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign pattern = forloop.index0 | modulo: 4
+            assign panel_class = 'issue-panel'
+            if pattern == 0 or pattern == 3
+              assign panel_class = 'issue-panel issue-panel--wide'
+            endif
+            assign art = product.metafields.custom.panel_art.value | default: product.featured_media
+            assign caption = product.metafields.custom.panel_caption.value
+            assign panel_number = forloop.index | plus: paginate.current_offset
+            assign title_id = 'PanelTitle-' | append: section.id | append: '-' | append: product.id
+          -%}
+          <li class="{{ panel_class }}" id="Panel-{{ panel_number }}" data-reveal>
+            <article class="panel issue-panel__frame" aria-labelledby="{{ title_id }}">
+              <a href="{{ product.url }}" class="issue-panel__art speed-lines" tabindex="-1" aria-hidden="true">
+                {%- if art -%}
+                  {%- liquid
+                    assign art_sizes = '(min-width: 990px) 400px, 50vw'
+                    if pattern == 0 or pattern == 3
+                      assign art_sizes = '(min-width: 1232px) 1200px, 100vw'
+                    endif
+                    assign art_loading = 'lazy'
+                    if panel_number == 1
+                      assign art_loading = 'eager'
+                    endif
+                  -%}
+                  {{
+                    art
+                    | image_url: width: 1400
+                    | image_tag:
+                      loading: art_loading,
+                      widths: '360, 540, 720, 900, 1100, 1400',
+                      sizes: art_sizes,
+                      alt: ''
+                  }}
+                {%- else -%}
+                  <span class="burst issue-panel__placeholder">{{ 'issues.panel_label' | t: number: panel_number }}</span>
+                {%- endif -%}
+                <span class="issue-panel__number">{{ panel_number }}</span>
+              </a>
+              {%- if caption != blank -%}
+                <p class="caption-box issue-panel__caption">{{ caption | escape | newline_to_br }}</p>
+              {%- endif -%}
+
+              <div class="issue-panel__info">
+                <h2 class="issue-panel__title" id="{{ title_id }}">
+                  <a href="{{ product.url }}">{{ product.title | escape }}</a>
+                </h2>
+                {% render 'price', product: product %}
+                {% render 'quick-add', product: product, id_prefix: section.id, compact: true %}
+              </div>
+            </article>
+          </li>
+        {%- endfor -%}
+      </ol>
+      <div class="container">{% render 'pagination', paginate: paginate %}</div>
+    {%- endpaginate -%}
+
+    <footer class="issue-end container" data-reveal>
+      <p class="issue-end__tbc">{{ 'issues.to_be_continued' | t }}</p>
+      {%- liquid
+        assign next_status = 'none'
+        if next_issue
+          assign next_status = next_issue.metafields.custom.issue_status.value | default: 'open' | downcase | strip
+        endif
+      -%}
+      <div class="issue-end__grid">
+        {%- if next_issue -%}
+          <div class="panel issue-end__next{% if next_status == 'sealed' %} panel--violet{% endif %}">
+            <p class="caption-box">{{ 'issues.next_issue' | t: number: next_number }}</p>
+            <h2 class="issue-end__heading">{{ next_issue.title | escape }}</h2>
+            {%- if next_status == 'sealed' -%}
+              {%- assign notify_tags = 'newsletter, fan-club, notify-' | append: next_issue.handle -%}
+              {%- assign notify_label = 'issues.notify_submit' | t -%}
+              {%- assign notify_id = 'NotifyNext-' | append: section.id -%}
+              <p>{{ 'issues.notify_text' | t: number: next_number }}</p>
+              {% render 'fan-club-form', form_id: notify_id, tags: notify_tags, button_label: notify_label %}
+            {%- else -%}
+              <a href="{{ next_issue.url }}" class="btn btn--primary">{{ 'issues.read' | t: number: next_number }}</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- comment -%} A sealed next issue already has its own signup above. {%- endcomment -%}
+        {%- unless next_status == 'sealed' -%}
+        <div class="panel issue-end__club">
+          <h2 class="issue-end__heading">{{ section.settings.club_heading | escape }}</h2>
+          {%- if section.settings.club_text != blank -%}
+            <div class="rte">{{ section.settings.club_text }}</div>
+          {%- endif -%}
+          {%- assign club_id = 'FanClubIssue-' | append: section.id -%}
+          {% render 'fan-club-form', form_id: club_id %}
+        </div>
+        {%- endunless -%}
+      </div>
+    </footer>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Issue reader",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Panels come from the products in this collection, in collection order. Captions and panel art come from each product's metafields."
+    },
+    {
+      "type": "number",
+      "id": "fallback_number",
+      "label": "Issue number (if the collection metafield is empty)",
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "club_heading",
+      "label": "Fan club heading",
+      "default": "Don't miss the next issue"
+    },
+    {
+      "type": "richtext",
+      "id": "club_text",
+      "label": "Fan club text",
+      "default": "<p>Fan club members get early access to every drop.</p>"
+    }
+  ]
+}
+{% endschema %}

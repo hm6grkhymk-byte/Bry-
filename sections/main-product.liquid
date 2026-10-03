@@ -1,98 +1,288 @@
 {%- comment -%}
-  Basic product page so "Add to stash" can be tested now.
-  Becomes the full "Panel close-up" (photos, size chart, story caption) in build step 4.
+  "Panel close-up": the product page.
+  - Swipeable photo gallery (scroll-snap) with thumbnails
+  - Option chips (size, color) that pick the variant; a plain dropdown without JS
+  - Size chart: product metafield custom.size_chart (Page reference), or the section's default page
+  - Story caption + panel art from product metafields custom.panel_caption / custom.panel_art
+  - Product structured data (JSON-LD) for search engines
 {%- endcomment -%}
-{%- assign current_variant = product.selected_or_first_available_variant -%}
+{{ 'section-product.css' | asset_url | stylesheet_tag }}
 
-<section class="section">
-  <div class="container product-basic">
-    <div class="product-basic__media panel">
-      {%- if product.featured_media -%}
-        {{
-          product.featured_media
-          | image_url: width: 1200
-          | image_tag:
-            loading: 'eager',
-            fetchpriority: 'high',
-            widths: '400, 600, 800, 1000, 1200',
-            sizes: '(min-width: 990px) 600px, 100vw',
-            alt: product.featured_media.alt | default: product.title
-        }}
-      {%- else -%}
-        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-      {%- endif -%}
-    </div>
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-' | append: section.id
 
-    <div class="product-basic__info">
-      <h1 class="product-basic__title">{{ product.title | escape }}</h1>
-      {% render 'price', product: product, variant: current_variant %}
+  assign issue = nil
+  for c in product.collections
+    if c.template_suffix == 'issue'
+      assign issue = c
+      break
+    endif
+  endfor
 
-      {%- assign product_form_id = 'ProductForm-' | append: section.id -%}
-      {%- form 'product', product, id: product_form_id, class: 'product-basic__form', data-stash-form: '' -%}
-        {%- if product.has_only_default_variant -%}
-          <input type="hidden" name="id" value="{{ current_variant.id }}">
+  assign panel_number = nil
+  assign issue_number = nil
+  if issue
+    assign issue_number = issue.metafields.custom.issue_number.value | default: 1
+    for p in issue.products
+      if p.id == product.id
+        assign panel_number = forloop.index
+        break
+      endif
+    endfor
+  endif
+
+  assign caption = product.metafields.custom.panel_caption.value
+  assign panel_art = product.metafields.custom.panel_art.value
+  assign size_chart = product.metafields.custom.size_chart.value | default: section.settings.size_chart_page
+-%}
+
+<section class="closeup" data-product-section>
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="{{ 'breadcrumbs.label' | t }}">
+      <ol role="list">
+        <li><a href="{{ routes.root_url }}">{{ 'general.home' | t }}</a></li>
+        {%- if issue -%}
+          <li><a href="{{ issue.url }}">{{ 'issues.issue_label' | t: number: issue_number }}</a></li>
         {%- else -%}
-          <label class="product-basic__label" for="{{ product_form_id }}-variant">
-            {{- product.options | join: ' / ' -}}
-          </label>
-          <select id="{{ product_form_id }}-variant" name="id" class="field">
-            {%- for variant in product.variants -%}
-              <option
-                value="{{ variant.id }}"
-                {% if variant == current_variant %}
-                  selected
-                {% endif %}
-                {% unless variant.available %}
-                  disabled
-                {% endunless %}
-              >
-                {{ variant.title | escape }}
-                {%- unless variant.available %} – {{ 'products.sold_out' | t }}{% endunless -%}
-              </option>
+          <li><a href="{{ routes.all_products_collection_url }}">{{ 'collections.longbox' | t }}</a></li>
+        {%- endif -%}
+        <li><span aria-current="page">{{ product.title | escape }}</span></li>
+      </ol>
+    </nav>
+
+    <div class="closeup__layout">
+      {%- comment -%} Gallery {%- endcomment -%}
+      <div class="closeup__media" data-gallery>
+        <ul class="closeup__track panel" role="list" data-gallery-track tabindex="0" aria-label="{{ 'products.gallery' | t }}">
+          {%- for media in product.media -%}
+            <li
+              class="closeup__slide"
+              id="Media-{{ section.id }}-{{ media.id }}"
+              data-gallery-slide
+            >
+              {%- if media.media_type == 'image' -%}
+                {%- liquid
+                  assign media_loading = 'lazy'
+                  if forloop.first
+                    assign media_loading = 'eager'
+                  endif
+                -%}
+                {{
+                  media
+                  | image_url: width: 1600
+                  | image_tag:
+                    loading: media_loading,
+                    widths: '400, 600, 800, 1000, 1300, 1600',
+                    sizes: '(min-width: 990px) 600px, calc(100vw - 32px)',
+                    alt: media.alt | default: product.title
+                }}
+              {%- else -%}
+                {{ media | media_tag: image_size: '1200x' }}
+              {%- endif -%}
+            </li>
+          {%- else -%}
+            <li class="closeup__slide">{{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}</li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if product.media.size > 1 -%}
+          <ul class="closeup__thumbs" role="list">
+            {%- for media in product.media -%}
+              <li>
+                <button
+                  type="button"
+                  class="closeup__thumb"
+                  data-gallery-thumb="Media-{{ section.id }}-{{ media.id }}"
+                  aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                >
+                  {{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}
+                  <span class="visually-hidden">{{ 'products.show_image' | t: number: forloop.index }}</span>
+                </button>
+              </li>
             {%- endfor -%}
-          </select>
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Info + buy {%- endcomment -%}
+      <div class="closeup__info">
+        {%- if issue -%}
+          <p class="caption-box">
+            {{ 'issues.issue_label' | t: number: issue_number -}}
+            {%- if panel_number %} · {{ 'issues.panel_label' | t: number: panel_number }}{% endif %}
+          </p>
         {%- endif -%}
 
-        <button
-          type="submit"
-          name="add"
-          class="btn btn--primary btn--block"
-          {% unless current_variant.available %}
-            disabled
-          {% endunless %}
-        >
-          {%- if current_variant.available -%}
-            {{ 'products.add_to_stash' | t }}
-          {%- else -%}
-            {{ 'products.sold_out' | t }}
-          {%- endif -%}
-        </button>
-        <p class="form-error" role="alert" data-stash-error></p>
-      {%- endform -%}
+        <h1 class="closeup__title">{{ product.title | escape }}</h1>
+        {% render 'price', product: product, variant: current_variant %}
 
-      {%- if product.description != blank -%}
-        <div class="rte product-basic__description">{{ product.description }}</div>
-      {%- endif -%}
+        {%- form 'product', product, id: form_id, class: 'closeup__form', data-stash-form: '' -%}
+          {%- unless product.has_only_default_variant -%}
+            <div class="variant-picker js-only" data-variant-picker data-form="{{ form_id }}" data-section="{{ section.id }}" data-url="{{ product.url }}">
+              {%- for option in product.options_with_values -%}
+                {%- assign option_index = forloop.index0 -%}
+                <fieldset class="variant-picker__option" data-option-index="{{ option_index }}">
+                  <legend class="variant-picker__legend">
+                    {{ option.name | escape }}: <span data-option-value>{{ option.selected_value | escape }}</span>
+                  </legend>
+                  <div class="chips">
+                    {%- for value in option.values -%}
+                      <label class="chip">
+                        <input
+                          type="radio"
+                          name="{{ section.id }}-{{ option.position }}"
+                          value="{{ value | escape }}"
+                          {% if option.selected_value == value %}
+                            checked
+                          {% endif %}
+                        >
+                        <span>{{ value | escape }}</span>
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                </fieldset>
+              {%- endfor -%}
+              <script type="application/json" data-variants>
+                [
+                  {%- for variant in product.variants -%}
+                    {%- capture variant_price -%}{% render 'price', product: product, variant: variant %}{%- endcapture -%}
+                    {
+                      "id": {{ variant.id }},
+                      "options": {{ variant.options | json }},
+                      "available": {{ variant.available | json }},
+                      "media_id": {{ variant.featured_media.id | json }},
+                      "price_html": {{ variant_price | strip | json }}
+                    }{% unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                ]
+              </script>
+            </div>
+          {%- endunless -%}
+
+          <div class="{% unless product.has_only_default_variant %}no-js-only{% endunless %}">
+            {%- if product.has_only_default_variant -%}
+              <input type="hidden" name="id" value="{{ current_variant.id }}">
+            {%- else -%}
+              <label class="variant-picker__legend" for="{{ form_id }}-select">{{ product.options | join: ' / ' }}</label>
+              <select id="{{ form_id }}-select" name="id" class="field">
+                {%- for variant in product.variants -%}
+                  <option
+                    value="{{ variant.id }}"
+                    {% if variant == current_variant %}
+                      selected
+                    {% endif %}
+                    {% unless variant.available %}
+                      disabled
+                    {% endunless %}
+                  >
+                    {{ variant.title | escape }}
+                    {%- unless variant.available %} – {{ 'products.sold_out' | t }}{% endunless -%}
+                  </option>
+                {%- endfor -%}
+              </select>
+            {%- endif -%}
+          </div>
+
+          {%- if size_chart != blank -%}
+            <details class="size-chart">
+              <summary class="link-button">{{ 'products.size_chart' | t }}</summary>
+              <div class="size-chart__body panel rte">{{ size_chart.content }}</div>
+            </details>
+          {%- endif -%}
+
+          <button
+            type="submit"
+            name="add"
+            class="btn btn--primary btn--block closeup__add"
+            data-add-button
+            data-add-text="{{ 'products.add_to_stash' | t }}"
+            data-sold-out-text="{{ 'products.sold_out' | t }}"
+            data-unavailable-text="{{ 'products.unavailable' | t }}"
+            {% unless current_variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {%- if current_variant.available -%}
+              {{ 'products.add_to_stash' | t }}
+            {%- else -%}
+              {{ 'products.sold_out' | t }}
+            {%- endif -%}
+          </button>
+          <p class="form-error" role="alert" data-stash-error></p>
+
+          {%- if section.settings.show_dynamic_checkout -%}
+            {{ form | payment_button }}
+          {%- endif -%}
+        {%- endform -%}
+
+        {%- if caption != blank or panel_art -%}
+          <aside class="closeup__story panel">
+            {%- if panel_art -%}
+              <div class="closeup__story-art">
+                {{ panel_art | image_url: width: 600 | image_tag: loading: 'lazy', widths: '200, 400, 600', sizes: '160px', alt: '' }}
+              </div>
+            {%- endif -%}
+            <div class="closeup__story-text">
+              {%- if caption != blank -%}
+                <p class="caption-box">{{ caption | escape | newline_to_br }}</p>
+              {%- endif -%}
+              {%- if issue -%}
+                <a href="{{ issue.url }}#Panel-{{ panel_number }}" class="closeup__story-link">{{ 'products.read_in_issue' | t: number: issue_number }}</a>
+              {%- endif -%}
+            </div>
+          </aside>
+        {%- endif -%}
+
+        {%- if product.description != blank -%}
+          <div class="rte closeup__description">{{ product.description }}</div>
+        {%- endif -%}
+      </div>
     </div>
+
+    {%- if issue and section.settings.show_more_from_issue and issue.products_count > 1 -%}
+      <div class="closeup__more">
+        <h2 class="closeup__more-title">{{ 'products.more_from_issue' | t: number: issue_number }}</h2>
+        <ul class="comic-grid" role="list">
+          {%- assign shown = 0 -%}
+          {%- for p in issue.products -%}
+            {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
+            <li>{% render 'product-card', product: p, id_prefix: section.id %}</li>
+            {%- assign shown = shown | plus: 1 -%}
+            {%- if shown >= 3 -%}{%- break -%}{%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
   </div>
 </section>
 
-<style>
-  .product-basic { display: grid; gap: var(--space-6); }
-  .product-basic__media { overflow: hidden; aspect-ratio: 4 / 5; }
-  .product-basic__media img, .product-basic__media svg { width: 100%; height: 100%; object-fit: cover; }
-  .product-basic__title { margin-bottom: var(--space-2); }
-  .product-basic__form { display: grid; gap: var(--space-3); margin: var(--space-5) 0; }
-  .product-basic__label { font-weight: 700; }
-  .product-basic__description { margin-top: var(--space-5); }
-  @media (min-width: 990px) {
-    .product-basic { grid-template-columns: 1fr 1fr; align-items: start; gap: var(--space-8); }
-  }
-</style>
+<script type="application/ld+json">
+  {{ product | structured_data }}
+</script>
 
 {% schema %}
 {
-  "name": "Product",
-  "settings": []
+  "name": "Panel close-up",
+  "settings": [
+    {
+      "type": "page",
+      "id": "size_chart_page",
+      "label": "Default size chart",
+      "info": "Create a page with the size table, then pick it here. A product can override it with its own size chart metafield."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show express checkout buttons (Shop Pay, Apple Pay…)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_more_from_issue",
+      "label": "Show \"More from this issue\"",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

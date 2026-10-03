@@ -1,0 +1,50 @@
+{{ 'section-pages.css' | asset_url | stylesheet_tag }}
+
+<section class="section contact">
+  <div class="container">
+    <div class="panel page-panel contact__panel">
+      {%- if section.settings.heading != blank -%}
+        <h2>{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+      {%- assign contact_id = 'ContactForm-' | append: section.id -%}
+      {%- form 'contact', id: contact_id, class: 'contact__form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="caption-box" role="status" tabindex="-1" autofocus>{{ 'contact.success' | t }}</p>
+        {%- else -%}
+          {%- if form.errors -%}
+            <div class="form-error" role="alert">{{ form.errors | default_errors }}</div>
+          {%- endif -%}
+          <div class="contact__row">
+            <label class="contact__field">
+              <span>{{ 'contact.name' | t }}</span>
+              <input class="field" type="text" name="contact[name]" value="{{ form.name }}" autocomplete="name">
+            </label>
+            <label class="contact__field">
+              <span>{{ 'contact.email' | t }} <span aria-hidden="true">*</span></span>
+              <input class="field" type="email" name="contact[email]" value="{{ form.email }}" autocomplete="email" required>
+            </label>
+          </div>
+          <label class="contact__field">
+            <span>{{ 'contact.order' | t }}</span>
+            <input class="field" type="text" name="contact[order]" autocomplete="off">
+          </label>
+          <label class="contact__field">
+            <span>{{ 'contact.message' | t }} <span aria-hidden="true">*</span></span>
+            <textarea class="field" name="contact[body]" rows="6" required>{{ form.body }}</textarea>
+          </label>
+          <button type="submit" class="btn btn--primary">{{ 'contact.send' | t }}</button>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Send us a message" }
+  ],
+  "presets": [{ "name": "Contact form" }]
+}
+{% endschema %}

@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "club": {
+      "type": "fan-club",
+      "settings": { "heading_is_h1": true }
+    }
+  },
+  "order": ["club"]
+}

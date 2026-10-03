@@ -1,21 +1,174 @@
 {%- comment -%}
-  Basic collection grid. Becomes the "Issue reader" (build step 3) and the
-  filterable "Longbox" (build step 5).
+  "The longbox": every product in a plain, fast grid with filters and sorting.
+  Filters come from Shopify's Search & Discovery app (Product type, Issue, Size, Price…).
+  Collections that should read like a comic use the "issue" template instead.
 {%- endcomment -%}
-<section class="section">
+{{ 'section-longbox.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign heading = collection.title
+  if collection.handle == 'all' and section.settings.all_heading != blank
+    assign heading = section.settings.all_heading
+  endif
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign active_count = 0
+  for filter in collection.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<section class="section longbox">
   <div class="container">
-    <header class="page-heading">
-      <h1>{{ collection.title | escape }}</h1>
+    <header class="longbox__header">
+      <p class="caption-box">{{ 'collections.longbox' | t }}</p>
+      <h1 class="longbox__title">{{ heading | escape }}</h1>
       {%- if collection.description != blank -%}
-        <div class="rte">{{ collection.description }}</div>
+        <div class="rte longbox__text">{{ collection.description }}</div>
       {%- endif -%}
     </header>
 
+    {%- if section.settings.show_issue_links -%}
+      <nav class="longbox__issues" aria-label="{{ 'collections.by_issue' | t }}">
+        <ul role="list">
+          {%- for c in collections -%}
+            {%- unless c.template_suffix == 'issue' -%}{%- continue -%}{%- endunless -%}
+            {%- assign c_status = c.metafields.custom.issue_status.value | default: 'open' | downcase | strip -%}
+            {%- if c_status == 'sealed' -%}{%- continue -%}{%- endif -%}
+            {%- assign c_number = c.metafields.custom.issue_number.value | default: forloop.index -%}
+            <li><a class="longbox__issue-link" href="{{ c.url }}">{{ 'issues.issue_label' | t: number: c_number }}: {{ c.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
     {%- paginate collection.products by section.settings.per_page -%}
+      <form class="longbox__filters" action="{{ collection.url }}" method="get" data-filter-form>
+        <details class="longbox__drawer"{% if active_count > 0 %} open{% endif %}>
+          <summary class="btn btn--yellow btn--small">
+            {{ 'collections.filter_sort' | t }}
+            {%- if active_count > 0 %} ({{ active_count }}){% endif -%}
+          </summary>
+
+          <div class="longbox__drawer-body panel">
+            {%- for filter in collection.filters -%}
+              {%- case filter.type -%}
+                {%- when 'list', 'boolean' -%}
+                  <fieldset class="filter">
+                    <legend class="filter__legend">{{ filter.label | escape }}</legend>
+                    <div class="chips">
+                      {%- for value in filter.values -%}
+                        <label class="chip">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value }}"
+                            {% if value.active %}
+                              checked
+                            {% endif %}
+                            {% if value.count == 0 and value.active == false %}
+                              disabled
+                            {% endif %}
+                          >
+                          <span>{{ value.label | escape }} <small>({{ value.count }})</small></span>
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- when 'price_range' -%}
+                  <fieldset class="filter">
+                    <legend class="filter__legend">{{ filter.label | escape }}</legend>
+                    <div class="filter__price">
+                      <label>
+                        <span>{{ 'collections.price_from' | t }}</span>
+                        <input
+                          class="field field--small"
+                          type="number"
+                          inputmode="decimal"
+                          name="{{ filter.min_value.param_name }}"
+                          {% if filter.min_value.value %}
+                            value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                          {% endif %}
+                          placeholder="0"
+                          min="0"
+                        >
+                      </label>
+                      <label>
+                        <span>{{ 'collections.price_to' | t }}</span>
+                        <input
+                          class="field field--small"
+                          type="number"
+                          inputmode="decimal"
+                          name="{{ filter.max_value.param_name }}"
+                          {% if filter.max_value.value %}
+                            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                          {% endif %}
+                          placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                          min="0"
+                        >
+                      </label>
+                    </div>
+                  </fieldset>
+              {%- endcase -%}
+            {%- endfor -%}
+
+            <div class="filter">
+              <label class="filter__legend" for="SortBy-{{ section.id }}">{{ 'collections.sort_by' | t }}</label>
+              <select id="SortBy-{{ section.id }}" class="field field--small" name="sort_by">
+                {%- for option in collection.sort_options -%}
+                  <option
+                    value="{{ option.value }}"
+                    {% if option.value == sort_by %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ option.name | escape }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+
+            <div class="longbox__filter-actions">
+              <button type="submit" class="btn btn--small no-js-only">{{ 'collections.apply' | t }}</button>
+              {%- if active_count > 0 -%}
+                <a href="{{ collection.url }}?sort_by={{ sort_by }}" class="link-button">{{ 'collections.clear' | t }}</a>
+              {%- endif -%}
+            </div>
+          </div>
+        </details>
+      </form>
+
+      {%- if active_count > 0 -%}
+        <ul class="longbox__active" role="list">
+          {%- for filter in collection.filters -%}
+            {%- for value in filter.active_values -%}
+              <li>
+                <a href="{{ value.url_to_remove }}" class="longbox__pill">
+                  {{ value.label | escape }} ✕
+                  <span class="visually-hidden">{{ 'collections.remove_filter' | t: label: value.label }}</span>
+                </a>
+              </li>
+            {%- endfor -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      <p class="longbox__count" role="status">{{ 'collections.product_count' | t: count: collection.products_count }}</p>
+
       {%- if collection.products.size > 0 -%}
-        <ul class="comic-grid" role="list">
+        <ul class="comic-grid longbox__grid" role="list">
           {%- for product in collection.products -%}
-            <li>{% render 'product-card', product: product, position: forloop.index %}</li>
+            <li>
+              {%- if section.settings.show_quick_add -%}
+                {% render 'product-card', product: product, position: forloop.index, id_prefix: section.id, heading: 'h2' %}
+              {%- else -%}
+                {% render 'product-card', product: product, position: forloop.index, heading: 'h2' %}
+              {%- endif -%}
+            </li>
           {%- endfor -%}
         </ul>
       {%- else -%}
@@ -29,16 +182,38 @@
 
 {% schema %}
 {
-  "name": "Collection",
+  "name": "Longbox",
   "settings": [
+    {
+      "type": "text",
+      "id": "all_heading",
+      "label": "Heading on the \"all products\" page",
+      "default": "Every panel, every issue"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_issue_links",
+      "label": "Show links to each issue",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show \"Add to stash\" on each card",
+      "default": true
+    },
     {
       "type": "range",
       "id": "per_page",
       "label": "Products per page",
-      "min": 6,
+      "min": 8,
       "max": 48,
-      "step": 6,
+      "step": 4,
       "default": 24
+    },
+    {
+      "type": "paragraph",
+      "content": "Filters (type, issue, size, price) are set up in the Search & Discovery app."
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "main": { "type": "main-page", "settings": {} },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": { "type": "question", "settings": { "question": "How do the sizes fit?", "answer": "<p>Check the size chart on each product page. Placeholder: add your fit notes here.</p>" } },
+        "q2": { "type": "question", "settings": { "question": "When will my order ship?", "answer": "<p>Placeholder: add your processing and shipping times.</p>" } },
+        "q3": { "type": "question", "settings": { "question": "Can I return or exchange?", "answer": "<p>Placeholder: add your return policy.</p>" } },
+        "q4": { "type": "question", "settings": { "question": "When does the next issue drop?", "answer": "<p>Join the fan club and you'll hear first.</p>" } }
+      },
+      "block_order": ["q1", "q2", "q3", "q4"],
+      "settings": { "heading": "Questions? Answers." }
+    }
+  },
+  "order": ["main", "faq"]
+}

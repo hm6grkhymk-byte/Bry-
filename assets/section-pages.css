@@ -1,0 +1,373 @@
+/* ==========================================================================
+   Content pages: origin story strip, fan club, FAQ, contact, 404
+   ========================================================================== */
+
+/* ---------- Comic strip ---------- */
+.comic-strip__header {
+  margin-bottom: var(--space-6);
+}
+
+.comic-strip__title {
+  margin: var(--space-3) 0 0;
+  text-transform: uppercase;
+}
+
+.comic-strip__grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.strip-panel {
+  display: flex;
+  min-width: 0;
+}
+
+.strip-panel--wide {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 990px) {
+  .strip-panel--tall {
+    grid-row: span 2;
+  }
+}
+
+.strip-panel__frame {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.strip-panel--wide .strip-panel__frame {
+  min-height: 260px;
+}
+
+.strip-panel__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.strip-panel__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0.85;
+}
+
+.strip-panel__placeholder .burst {
+  width: 8rem;
+  font-size: 0.8rem;
+}
+
+.strip-panel__caption {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  max-width: calc(100% - var(--space-6));
+  z-index: 1;
+}
+
+.strip-panel__balloon {
+  position: absolute;
+  bottom: var(--space-5);
+  z-index: 1;
+  max-width: calc(100% - var(--space-6));
+  padding: var(--space-2) var(--space-3);
+  font-size: clamp(0.8rem, 3vw, 1.05rem);
+}
+
+.strip-panel__caption {
+  font-size: clamp(0.72rem, 2.8vw, 0.95rem);
+}
+
+.strip-panel__balloon--left { left: var(--space-3); }
+.strip-panel__balloon--right { right: var(--space-3); }
+
+/* Character card */
+.character-card {
+  display: grid;
+  width: 100%;
+}
+
+@media (min-width: 750px) {
+  .character-card {
+    grid-template-columns: minmax(0, 320px) 1fr;
+  }
+}
+
+.character-card__art {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  border-bottom: var(--line) solid var(--ink);
+}
+
+@media (min-width: 750px) {
+  .character-card__art {
+    border-bottom: 0;
+    border-right: var(--line) solid var(--ink);
+  }
+}
+
+.character-card__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.character-card__art .burst {
+  width: 7rem;
+  font-size: 3rem;
+  --burst-fill: var(--magenta);
+}
+
+.character-card__info {
+  display: grid;
+  gap: var(--space-3);
+  align-content: center;
+  justify-items: start;
+  padding: var(--space-5);
+}
+
+.character-card__name {
+  margin: 0;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+}
+
+/* ---------- Fan club ---------- */
+.fan-club__panel {
+  position: relative;
+  display: grid;
+  padding: var(--space-6) var(--space-5);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 750px) {
+  .fan-club__panel {
+    padding: var(--space-7);
+  }
+}
+
+.fan-club__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  max-width: 36rem;
+}
+
+.fan-club__copy .caption-box {
+  color: var(--ink);
+}
+
+.fan-club__title {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.fan-club__text ul {
+  margin: 0;
+  padding-left: 1.2em;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.fan-club__copy .fan-club-form {
+  width: 100%;
+}
+
+.fan-club__fine {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.fan-club__burst {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 7rem;
+  margin: 0;
+  color: var(--ink);
+  transform: rotate(10deg);
+  --burst-fill: var(--yellow);
+}
+
+@media (max-width: 749px) {
+  .fan-club__burst {
+    position: static;
+    justify-self: end;
+    margin-top: calc(-1 * var(--space-4));
+    order: -1;
+    width: 5.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ---------- FAQ ---------- */
+.faq__container {
+  max-width: 48rem;
+}
+
+.faq__list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.faq__item {
+  box-shadow: var(--shadow-sm);
+}
+
+.faq__question {
+  position: relative;
+  padding: var(--space-4) var(--space-7) var(--space-4) var(--space-4);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq__question::-webkit-details-marker {
+  display: none;
+}
+
+.faq__question::after {
+  content: '+';
+  position: absolute;
+  top: 50%;
+  right: var(--space-4);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  background: var(--yellow);
+  border: var(--line-thin) solid var(--ink);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.faq__item[open] .faq__question::after {
+  content: '–';
+  background: var(--magenta);
+}
+
+.faq__answer {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ---------- Contact ---------- */
+.contact__form {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+
+.contact__row {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+@media (min-width: 750px) {
+  .contact__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.contact__field {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  font-weight: 700;
+}
+
+textarea.field {
+  resize: vertical;
+}
+
+/* ---------- 404: wrong universe ---------- */
+.wrong-universe {
+  display: grid;
+  overflow: hidden;
+}
+
+@media (min-width: 750px) {
+  .wrong-universe {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.wrong-universe__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 300px;
+  border-bottom: var(--line) solid var(--ink);
+  background: repeating-conic-gradient(from 0deg at 50% 55%, var(--paper) 0deg 5deg, color-mix(in srgb, var(--violet) 30%, var(--paper)) 5deg 9deg);
+}
+
+@media (min-width: 750px) {
+  .wrong-universe__art {
+    border-bottom: 0;
+    border-right: var(--line) solid var(--ink);
+  }
+}
+
+.wrong-universe__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wrong-universe__burst {
+  width: 10rem;
+  margin: 0;
+  font-size: 2.2rem;
+  --burst-fill: var(--magenta);
+  animation: wobble 2.4s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+.wrong-universe__balloon {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+
+.wrong-universe__copy {
+  display: grid;
+  gap: var(--space-3);
+  align-content: center;
+  justify-items: start;
+  padding: var(--space-6) var(--space-5);
+}
+
+.wrong-universe__copy h1 {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.wrong-universe__copy p {
+  margin: 0;
+}
+
+.wrong-universe__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

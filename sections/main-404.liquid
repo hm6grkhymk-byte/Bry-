@@ -1,25 +1,47 @@
-{%- comment -%}
-  "Wrong universe" 404. Character art is added in build step 6.
-{%- endcomment -%}
+{%- comment -%} "Wrong universe" 404. Upload the lost-character art in the theme editor. {%- endcomment -%}
+{{ 'section-pages.css' | asset_url | stylesheet_tag }}
+
 <section class="section">
   <div class="container">
-    <div class="panel page-panel not-found">
-      <p class="burst not-found__burst" aria-hidden="true">404</p>
-      <h1>{{ 'not_found.title' | t }}</h1>
-      <p class="balloon">{{ 'not_found.text' | t }}</p>
-      <p><a href="{{ routes.root_url }}" class="btn btn--primary">{{ 'not_found.cta' | t }}</a></p>
+    <div class="panel wrong-universe">
+      <div class="wrong-universe__art speed-lines">
+        {%- if section.settings.image != blank -%}
+          {{
+            section.settings.image
+            | image_url: width: 900
+            | image_tag:
+              loading: 'eager',
+              widths: '300, 500, 700, 900',
+              sizes: '(min-width: 750px) 420px, 90vw',
+              alt: section.settings.image.alt | default: ''
+          }}
+        {%- else -%}
+          <p class="burst wrong-universe__burst" aria-hidden="true">404</p>
+        {%- endif -%}
+        {%- if section.settings.balloon != blank -%}
+          <p class="balloon wrong-universe__balloon">{{ section.settings.balloon | escape }}</p>
+        {%- endif -%}
+      </div>
+      <div class="wrong-universe__copy">
+        <p class="caption-box">{{ section.settings.caption | escape }}</p>
+        <h1>{{ 'not_found.title' | t }}</h1>
+        <p>{{ 'not_found.text' | t }}</p>
+        <div class="wrong-universe__actions">
+          <a href="{{ routes.root_url }}" class="btn btn--primary">{{ 'not_found.cta' | t }}</a>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--secondary">{{ 'cart.empty_cta' | t }}</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<style>
-  .not-found { text-align: center; }
-  .not-found__burst { width: 9rem; font-size: 2rem; margin: 0 auto var(--space-4); --burst-fill: var(--magenta); }
-</style>
-
 {% schema %}
 {
-  "name": "404",
-  "settings": []
+  "name": "Wrong universe (404)",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Lost character art" },
+    { "type": "text", "id": "balloon", "label": "Speech balloon", "default": "Uh… where am I?" },
+    { "type": "text", "id": "caption", "label": "Caption box", "default": "Meanwhile, in the wrong universe…" }
+  ]
 }
 {% endschema %}

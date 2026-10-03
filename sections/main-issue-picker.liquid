@@ -1,0 +1,181 @@
+{%- comment -%}
+  "Pick your issue" (the /collections page).
+  Every collection that uses the "issue" template shows up here automatically.
+  Collection metafields (Settings › Custom data › Collections):
+  - custom.issue_number  (Integer)            e.g. 1
+  - custom.issue_status  (Single line text)   "open" or "sealed"
+  - custom.issue_teaser  (Multi-line text)    shown on sealed issues
+  The collection image is the cover (use a silhouette/teaser for sealed issues).
+{%- endcomment -%}
+{{ 'section-issues.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign issue_count = 0
+  for c in collections
+    if c.template_suffix == 'issue'
+      assign issue_count = issue_count | plus: 1
+    endif
+  endfor
+-%}
+
+<section class="section issue-picker">
+  <div class="container">
+    <header class="issue-picker__header">
+      <p class="caption-box">{{ section.settings.kicker | escape }}</p>
+      <h1 class="issue-picker__title">{{ section.settings.heading | escape }}</h1>
+      {%- if section.settings.text != blank -%}
+        <div class="rte issue-picker__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- if issue_count > 0 -%}
+      <ul class="issue-shelf" role="list">
+        {%- assign issue_position = 0 -%}
+        {%- for c in collections -%}
+          {%- unless c.template_suffix == 'issue' -%}{%- continue -%}{%- endunless -%}
+          {%- liquid
+            assign issue_position = issue_position | plus: 1
+            assign number = c.metafields.custom.issue_number.value | default: issue_position
+            assign status = c.metafields.custom.issue_status.value | default: 'open' | downcase | strip
+            assign teaser = c.metafields.custom.issue_teaser.value | default: c.description | strip_html
+            assign issue_label = 'issues.issue_label' | t: number: number
+          -%}
+          <li class="issue-tile{% if status == 'sealed' %} issue-tile--sealed{% endif %}">
+            {%- if status == 'sealed' -%}
+              <div class="issue-tile__cover panel polybag">
+                {%- if c.featured_image -%}
+                  {{
+                    c.featured_image
+                    | image_url: width: 900
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '360, 540, 720, 900',
+                      sizes: '(min-width: 990px) 360px, (min-width: 750px) 45vw, 90vw',
+                      alt: c.featured_image.alt | default: c.title
+                  }}
+                {%- else -%}
+                  <div class="issue-tile__placeholder issue-tile__placeholder--sealed" aria-hidden="true">?</div>
+                {%- endif -%}
+                <span class="polybag__tape" aria-hidden="true">{{ 'issues.sealed' | t }}</span>
+                <span class="issue-tile__number" aria-hidden="true">#{{ number }}</span>
+              </div>
+              <div class="issue-tile__info">
+                <p class="caption-box caption-box--violet">{{ issue_label }} · {{ 'issues.sealed' | t }}</p>
+                <h2 class="issue-tile__title">{{ c.title | escape }}</h2>
+                {%- if teaser != blank -%}
+                  <p class="issue-tile__teaser">{{ teaser | truncate: 160 | escape }}</p>
+                {%- endif -%}
+                <details class="notify">
+                  <summary class="btn btn--dark">{{ 'issues.notify' | t }}</summary>
+                  <div class="notify__body">
+                    <p>{{ 'issues.notify_text' | t: number: number }}</p>
+                    {%- assign notify_tags = 'newsletter, fan-club, notify-' | append: c.handle -%}
+                    {%- assign notify_id = 'Notify-' | append: section.id | append: '-' | append: c.id -%}
+                    {%- assign notify_label = 'issues.notify_submit' | t -%}
+                    {% render 'fan-club-form', form_id: notify_id, tags: notify_tags, button_label: notify_label %}
+                  </div>
+                </details>
+              </div>
+            {%- else -%}
+              <a href="{{ c.url }}" class="issue-tile__cover panel" tabindex="-1" aria-hidden="true">
+                {%- if c.featured_image -%}
+                  {{
+                    c.featured_image
+                    | image_url: width: 900
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '360, 540, 720, 900',
+                      sizes: '(min-width: 990px) 360px, (min-width: 750px) 45vw, 90vw',
+                      alt: ''
+                  }}
+                {%- else -%}
+                  <div class="issue-tile__placeholder speed-lines">
+                    <span class="burst">{{ issue_label }}</span>
+                  </div>
+                {%- endif -%}
+                <span class="issue-tile__number">#{{ number }}</span>
+              </a>
+              <div class="issue-tile__info">
+                <p class="caption-box">{{ issue_label }} · {{ 'issues.panels' | t: count: c.products_count }}</p>
+                <h2 class="issue-tile__title"><a href="{{ c.url }}">{{ c.title | escape }}</a></h2>
+                {%- if teaser != blank -%}
+                  <p class="issue-tile__teaser">{{ teaser | truncate: 160 | escape }}</p>
+                {%- endif -%}
+                <a href="{{ c.url }}" class="btn btn--primary">
+                  {{- 'issues.read' | t: number: number -}}
+                  {% render 'icon', icon: 'arrow' %}
+                </a>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      {%- if request.design_mode -%}
+        <p class="balloon">{{ 'issues.none' | t }}</p>
+      {%- endif -%}
+      <ul class="comic-grid" role="list">
+        {%- for c in collections -%}
+          <li>
+            <article class="panel product-card-panel">
+              <a href="{{ c.url }}" class="product-card">
+                <div class="product-card__media">
+                  {%- if c.featured_image -%}
+                    {{ c.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '300, 450, 600, 800', sizes: '(min-width: 990px) 380px, 50vw', alt: '' }}
+                  {%- else -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </div>
+                <div class="product-card__info">
+                  <h2 class="product-card__title">{{ c.title | escape }}</h2>
+                </div>
+              </a>
+            </article>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if section.settings.show_longbox_link -%}
+      <p class="issue-picker__longbox">
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--secondary">{{ 'issues.skip_to_shop' | t }}</a>
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Pick your issue",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Issues appear here automatically: any collection using the \"issue\" template. Set each one's number and open/sealed status in the collection's metafields."
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Label",
+      "default": "The back issues"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Pick your issue"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Every drop is a new issue of the story. Open one up and shop it panel by panel.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_longbox_link",
+      "label": "Show \"shop everything\" button",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

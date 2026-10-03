@@ -1,0 +1,21 @@
+{
+  "sections": {
+    "strip": {
+      "type": "comic-strip",
+      "blocks": {
+        "p1": { "type": "panel", "settings": { "caption": "It started with a sketchbook and a city that never slept…", "size": "wide", "color": "paper" } },
+        "p2": { "type": "panel", "settings": { "balloon": "What if the comic was the clothes?", "balloon_position": "right", "size": "normal", "color": "cyan" } },
+        "p3": { "type": "panel", "settings": { "caption": "One screen print later…", "balloon": "We need more ink.", "balloon_position": "left", "size": "normal", "color": "yellow" } },
+        "hero": { "type": "character", "settings": { "name": "Main character", "role": "The hero", "bio": "<p>Character bio goes here: who they are, what they want, and why they wear what they wear.</p>" } },
+        "p4": { "type": "panel", "settings": { "caption": "And that's how Noviko got inked. Issue #1 picks up from here.", "size": "wide", "color": "magenta" } }
+      },
+      "block_order": ["p1", "p2", "p3", "hero", "p4"],
+      "settings": { "kicker": "Origin story", "heading": "How Noviko got inked", "heading_is_h1": true }
+    },
+    "club": {
+      "type": "fan-club",
+      "settings": {}
+    }
+  },
+  "order": ["strip", "club"]
+}

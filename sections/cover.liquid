@@ -1,7 +1,17 @@
 {{ 'section-cover.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
-  assign button_1_link = section.settings.button_1_link | default: routes.collections_url
+  # With no link set, "Read" goes to the newest open issue (or the issue picker).
+  assign first_issue_url = routes.collections_url
+  for c in collections
+    if c.template_suffix == 'issue'
+      assign c_status = c.metafields.custom.issue_status.value | default: 'open' | downcase | strip
+      if c_status != 'sealed'
+        assign first_issue_url = c.url
+      endif
+    endif
+  endfor
+  assign button_1_link = section.settings.button_1_link | default: first_issue_url
   assign button_2_link = section.settings.button_2_link | default: routes.all_products_collection_url
   assign art_alt = section.settings.image.alt | default: section.settings.heading
 -%}
@@ -155,7 +165,7 @@
       "type": "url",
       "id": "button_1_link",
       "label": "Main button link",
-      "info": "Point this at the Issue #1 collection."
+      "info": "Leave empty to link to the newest open issue automatically."
     },
     {
       "type": "text",

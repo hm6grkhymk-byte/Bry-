@@ -1,0 +1,16 @@
+{
+  "name": "noviko-theme-preview",
+  "private": true,
+  "type": "module",
+  "description": "Static, clickable preview of the NOVIKO theme with sample data (not part of the Shopify theme).",
+  "scripts": {
+    "build": "node build.mjs",
+    "shoot": "node shoot.mjs"
+  },
+  "dependencies": {
+    "liquidjs": "10.30.0"
+  },
+  "devDependencies": {
+    "playwright": "*"
+  }
+}

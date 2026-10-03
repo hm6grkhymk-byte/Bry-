@@ -1,0 +1,507 @@
+/* ==========================================================================
+   Issues: "Pick your issue" shelf + Issue reader
+   ========================================================================== */
+
+.caption-box--violet {
+  background: var(--violet);
+  color: var(--paper);
+}
+
+.caption-box--long {
+  display: block;
+  text-transform: none;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+/* ---------- Polybag (sealed issue) ---------- */
+.polybag {
+  position: relative;
+  overflow: hidden;
+  background: var(--violet);
+}
+
+.polybag img {
+  filter: saturate(0.5) brightness(0.55);
+}
+
+/* Glossy plastic sheen + bag flap */
+.polybag::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(115deg, transparent 0 18%, rgb(255 255 255 / 0.38) 22%, transparent 30% 58%, rgb(255 255 255 / 0.22) 62%, transparent 68%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.28) 0 7%, transparent 7%);
+  pointer-events: none;
+}
+
+.polybag::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7%;
+  z-index: 1;
+  border-top: 2px dashed rgb(255 255 255 / 0.7);
+}
+
+.polybag__tape {
+  position: absolute;
+  top: 42%;
+  left: -10%;
+  right: -10%;
+  z-index: 2;
+  padding: var(--space-2) 0;
+  background: var(--yellow);
+  border-block: var(--line-thin) solid var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  transform: rotate(-12deg);
+}
+
+/* ---------- Pick your issue ---------- */
+.issue-picker__header {
+  max-width: 40rem;
+  margin-bottom: var(--space-7);
+}
+
+.issue-picker__title {
+  margin-top: var(--space-3);
+  text-transform: uppercase;
+}
+
+.issue-shelf {
+  display: grid;
+  gap: var(--space-7);
+}
+
+@media (min-width: 750px) {
+  .issue-shelf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-7) var(--space-6);
+  }
+}
+
+@media (min-width: 990px) {
+  .issue-shelf {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.issue-tile {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.issue-tile__cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  transform: rotate(-1.2deg);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.issue-tile:nth-child(even) .issue-tile__cover {
+  transform: rotate(1.2deg);
+}
+
+a.issue-tile__cover:hover {
+  transform: rotate(0) translate(-3px, -3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.issue-tile__cover img,
+.issue-tile__placeholder,
+.issue-splash__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.issue-tile__placeholder {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+.issue-tile__placeholder .burst {
+  width: 9rem;
+  --burst-fill: var(--yellow);
+}
+
+.issue-tile__placeholder--sealed {
+  font-family: var(--font-display);
+  font-size: 7rem;
+  color: rgb(0 0 0 / 0.35);
+}
+
+.issue-tile__number {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
+  padding: var(--space-1) var(--space-2);
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.issue-tile__info {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.issue-tile__title {
+  margin: 0;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.issue-tile__title a {
+  text-decoration: none;
+}
+
+.issue-tile__teaser {
+  margin: 0;
+  font-weight: 700;
+}
+
+.notify {
+  width: 100%;
+}
+
+.notify > summary {
+  list-style: none;
+}
+
+.notify > summary::-webkit-details-marker {
+  display: none;
+}
+
+.notify__body {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--violet);
+  color: var(--paper);
+  border: var(--line) solid var(--ink);
+  box-shadow: var(--shadow);
+  animation: panel-pop 220ms var(--ease-pop);
+}
+
+.notify__body p {
+  font-weight: 700;
+}
+
+.issue-picker__longbox {
+  margin-top: var(--space-8);
+  text-align: center;
+}
+
+/* ---------- Issue reader: splash ---------- */
+.issue-splash {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-7);
+}
+
+.issue-splash__cover {
+  position: relative;
+  width: min(100%, 440px, 46svh);
+  min-width: min(100%, 260px);
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  overflow: hidden;
+  transform: rotate(-1deg);
+  box-shadow: var(--shadow-lg);
+}
+
+.issue-splash__info {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  align-content: center;
+}
+
+.issue-splash__title {
+  margin: 0;
+  font-size: clamp(2.2rem, 9vw, 4.2rem);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.issue-splash__intro {
+  max-width: 34rem;
+}
+
+.issue-splash__intro p {
+  margin: 0;
+}
+
+.issue-splash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.issue-splash__skip {
+  font-weight: 700;
+}
+
+@media (min-width: 990px) {
+  .issue-splash {
+    grid-template-columns: auto 1fr;
+    gap: var(--space-8);
+  }
+
+  .issue-splash__cover {
+    width: clamp(320px, calc((100svh - 240px) * 0.667), 440px);
+    margin: 0;
+  }
+}
+
+/* ---------- Issue reader: the comic page ---------- */
+.issue-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--panel-gap);
+  margin: 0 auto;
+  list-style: none;
+}
+
+.issue-panel {
+  display: flex;
+  min-width: 0;
+}
+
+.issue-panel--wide {
+  grid-column: span 2;
+}
+
+@media (min-width: 990px) {
+  .issue-page {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+.issue-panel__frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.issue-panel__art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-bottom: var(--line) solid var(--ink);
+}
+
+.issue-panel--wide .issue-panel__art {
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 990px) {
+  .issue-panel--wide .issue-panel__art {
+    aspect-ratio: 2.06 / 1;
+  }
+}
+
+.issue-panel__art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+.issue-panel__art:hover img {
+  transform: scale(1.03);
+}
+
+.issue-panel__placeholder {
+  width: min(9rem, 70%);
+  --burst-fill: var(--yellow);
+}
+
+/* Caption box sits in the top-left of the art, like real comic narration. */
+.issue-panel__caption {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 1;
+  max-width: calc(100% - var(--space-4));
+  font-size: 0.75rem;
+}
+
+.issue-panel--wide .issue-panel__caption {
+  max-width: min(70%, 28rem);
+  font-size: 0.85rem;
+}
+
+@media (min-width: 750px) {
+  .issue-panel__caption {
+    top: var(--space-3);
+    left: var(--space-3);
+    max-width: 80%;
+    font-size: 0.9rem;
+  }
+
+  .issue-panel--wide .issue-panel__caption {
+    font-size: 1rem;
+  }
+}
+
+.issue-panel__number {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 var(--space-1);
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.issue-panel__info {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  flex: 1;
+  padding: var(--space-3);
+}
+
+.issue-panel--wide .issue-panel__info {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 750px) {
+  .issue-panel__info {
+    padding: var(--space-4);
+  }
+
+  .issue-panel--wide .issue-panel__info {
+    grid-template-columns: 1fr minmax(0, 18rem);
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .issue-panel--wide .issue-panel__info .quick-add {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+.issue-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.issue-panel--wide .issue-panel__title {
+  font-size: 1.25rem;
+}
+
+.issue-panel__title a {
+  text-decoration: none;
+}
+
+.issue-panel__title a:hover {
+  text-decoration: underline;
+}
+
+.issue-panel .quick-add {
+  margin-top: var(--space-1);
+}
+
+/* Scroll reveal: panels "turn" in one at a time. JS only; reduced motion skips it. */
+.js [data-reveal] {
+  transition: opacity 420ms ease, transform 520ms var(--ease-pop);
+}
+
+.js [data-reveal]:not(.is-revealed) {
+  opacity: 0;
+  transform: translateY(28px) rotate(-1.5deg) scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal]:not(.is-revealed) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- To be continued ---------- */
+.issue-end {
+  padding-top: var(--space-8);
+}
+
+.issue-end__tbc {
+  margin: 0 auto var(--space-6);
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-5);
+  background: var(--yellow);
+  border: var(--line) solid var(--ink);
+  box-shadow: var(--shadow);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 6vw, 2.4rem);
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.issue-end__grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 750px) {
+  .issue-end__grid {
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+}
+
+.issue-end__grid > .panel {
+  padding: var(--space-5);
+}
+
+.issue-end__grid .caption-box {
+  margin-bottom: var(--space-3);
+}
+
+.issue-end__heading {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+}
+
+.issue-sealed {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-5);
+}
+
+.issue-sealed__text {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
