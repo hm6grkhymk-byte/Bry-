@@ -1,0 +1,179 @@
+{{ 'section-cover.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign button_1_link = section.settings.button_1_link | default: routes.collections_url
+  assign button_2_link = section.settings.button_2_link | default: routes.all_products_collection_url
+  assign art_alt = section.settings.image.alt | default: section.settings.heading
+-%}
+
+<section class="cover" aria-labelledby="CoverTitle-{{ section.id }}">
+  <div class="container cover__layout">
+    <div class="cover__book panel">
+      <div class="cover__masthead">
+        <p class="cover__corner" aria-hidden="true">
+          <span>{{ section.settings.corner_top | escape }}</span>
+          <span>{{ section.settings.corner_bottom | escape }}</span>
+        </p>
+        <div class="cover__logo" aria-hidden="true">
+          {%- render 'logo', size: 'hero' -%}
+        </div>
+      </div>
+
+      <div class="cover__art speed-lines">
+        {%- if section.settings.image != blank -%}
+          {{
+            section.settings.image
+            | image_url: width: 1500
+            | image_tag:
+              class: 'cover__image',
+              alt: art_alt,
+              widths: '480, 640, 800, 1000, 1200, 1500',
+              sizes: '(min-width: 990px) 560px, (min-width: 750px) 70vw, calc(100vw - 32px)',
+              loading: 'eager',
+              fetchpriority: 'high'
+          }}
+        {%- else -%}
+          <div class="cover__placeholder">
+            <span class="burst burst--big">{{ 'general.placeholder_art' | t }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.balloon != blank -%}
+          <p class="balloon balloon--right cover__balloon">{{ section.settings.balloon | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.burst != blank -%}
+          <p class="burst cover__burst">{{ section.settings.burst | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.caption != blank -%}
+          <p class="caption-box cover__caption">{{ section.settings.caption | escape }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="cover__barcode" aria-hidden="true"></div>
+    </div>
+
+    <div class="cover__blurb">
+      {%- if section.settings.kicker != blank -%}
+        <p class="caption-box cover__kicker">{{ section.settings.kicker | escape }}</p>
+      {%- endif -%}
+      <h2 id="CoverTitle-{{ section.id }}" class="cover__title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <div class="cover__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    <div class="cover__actions">
+      {%- if section.settings.button_1_label != blank -%}
+        <a href="{{ button_1_link }}" class="btn btn--primary">
+          {{- section.settings.button_1_label | escape -}}
+          {% render 'icon', icon: 'arrow' %}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.button_2_label != blank -%}
+        <a href="{{ button_2_link }}" class="btn btn--secondary">{{ section.settings.button_2_label | escape }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Issue cover",
+  "class": "section-cover",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cover"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Cover art",
+      "info": "Main character, portrait. About 1200 × 1500px, transparent PNG or WebP works best over the speed lines."
+    },
+    {
+      "type": "text",
+      "id": "corner_top",
+      "label": "Corner box, top line",
+      "default": "No. 1"
+    },
+    {
+      "type": "text",
+      "id": "corner_bottom",
+      "label": "Corner box, bottom line",
+      "default": "Vol. 1"
+    },
+    {
+      "type": "text",
+      "id": "balloon",
+      "label": "Speech balloon",
+      "default": "You picked the right comic."
+    },
+    {
+      "type": "text",
+      "id": "burst",
+      "label": "Burst sticker",
+      "default": "First issue!"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption box",
+      "default": "Meanwhile, in a city drawn in ink…"
+    },
+    {
+      "type": "header",
+      "content": "Next to the cover"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Issue label",
+      "default": "Issue #1"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Issue title",
+      "default": "Origin Story"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Every drop is a new issue. Read the story, pick your panel, wear the comic.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_1_label",
+      "label": "Main button label",
+      "default": "Read Issue #1"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Main button link",
+      "info": "Point this at the Issue #1 collection."
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Second button label",
+      "default": "Shop the tees"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Second button link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Issue cover"
+    }
+  ]
+}
+{% endschema %}

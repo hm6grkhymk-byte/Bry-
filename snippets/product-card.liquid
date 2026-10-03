@@ -1,0 +1,37 @@
+{%- comment -%}
+  Basic product card. Becomes the "longbox" card in build step 5.
+  Params: product (required), position (optional: 1 and 2 load right away, the rest lazy-load)
+{%- endcomment -%}
+<article class="panel product-card-panel">
+  <a href="{{ product.url }}" class="product-card">
+    <div class="product-card__media">
+      {%- if product.featured_media -%}
+        {%- liquid
+          assign loading = 'lazy'
+          if position and position <= 2
+            assign loading = 'eager'
+          endif
+        -%}
+        {{
+          product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            loading: loading,
+            widths: '300, 450, 600, 800',
+            sizes: '(min-width: 990px) 380px, 50vw',
+            alt: product.featured_media.alt | default: product.title
+        }}
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+    <div class="product-card__info">
+      <h3 class="product-card__title">{{ product.title | escape }}</h3>
+      {%- if product.available -%}
+        {% render 'price', product: product %}
+      {%- else -%}
+        <p class="price">{{ 'products.sold_out' | t }}</p>
+      {%- endif -%}
+    </div>
+  </a>
+</article>

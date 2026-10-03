@@ -1,0 +1,98 @@
+{%- comment -%}
+  Basic product page so "Add to stash" can be tested now.
+  Becomes the full "Panel close-up" (photos, size chart, story caption) in build step 4.
+{%- endcomment -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<section class="section">
+  <div class="container product-basic">
+    <div class="product-basic__media panel">
+      {%- if product.featured_media -%}
+        {{
+          product.featured_media
+          | image_url: width: 1200
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '400, 600, 800, 1000, 1200',
+            sizes: '(min-width: 990px) 600px, 100vw',
+            alt: product.featured_media.alt | default: product.title
+        }}
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </div>
+
+    <div class="product-basic__info">
+      <h1 class="product-basic__title">{{ product.title | escape }}</h1>
+      {% render 'price', product: product, variant: current_variant %}
+
+      {%- assign product_form_id = 'ProductForm-' | append: section.id -%}
+      {%- form 'product', product, id: product_form_id, class: 'product-basic__form', data-stash-form: '' -%}
+        {%- if product.has_only_default_variant -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {%- else -%}
+          <label class="product-basic__label" for="{{ product_form_id }}-variant">
+            {{- product.options | join: ' / ' -}}
+          </label>
+          <select id="{{ product_form_id }}-variant" name="id" class="field">
+            {%- for variant in product.variants -%}
+              <option
+                value="{{ variant.id }}"
+                {% if variant == current_variant %}
+                  selected
+                {% endif %}
+                {% unless variant.available %}
+                  disabled
+                {% endunless %}
+              >
+                {{ variant.title | escape }}
+                {%- unless variant.available %} – {{ 'products.sold_out' | t }}{% endunless -%}
+              </option>
+            {%- endfor -%}
+          </select>
+        {%- endif -%}
+
+        <button
+          type="submit"
+          name="add"
+          class="btn btn--primary btn--block"
+          {% unless current_variant.available %}
+            disabled
+          {% endunless %}
+        >
+          {%- if current_variant.available -%}
+            {{ 'products.add_to_stash' | t }}
+          {%- else -%}
+            {{ 'products.sold_out' | t }}
+          {%- endif -%}
+        </button>
+        <p class="form-error" role="alert" data-stash-error></p>
+      {%- endform -%}
+
+      {%- if product.description != blank -%}
+        <div class="rte product-basic__description">{{ product.description }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .product-basic { display: grid; gap: var(--space-6); }
+  .product-basic__media { overflow: hidden; aspect-ratio: 4 / 5; }
+  .product-basic__media img, .product-basic__media svg { width: 100%; height: 100%; object-fit: cover; }
+  .product-basic__title { margin-bottom: var(--space-2); }
+  .product-basic__form { display: grid; gap: var(--space-3); margin: var(--space-5) 0; }
+  .product-basic__label { font-weight: 700; }
+  .product-basic__description { margin-top: var(--space-5); }
+  @media (min-width: 990px) {
+    .product-basic { grid-template-columns: 1fr 1fr; align-items: start; gap: var(--space-8); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": []
+}
+{% endschema %}

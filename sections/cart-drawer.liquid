@@ -1,0 +1,105 @@
+{%- comment -%}
+  "Your stash": the slide-out cart. Rendered once in layout/theme.liquid and
+  re-rendered by assets/noviko.js (Section Rendering API) whenever the cart changes.
+  Without JavaScript the stash button links straight to the /cart page instead.
+{%- endcomment -%}
+<dialog id="StashDrawer" class="stash-drawer" aria-labelledby="StashDrawerTitle" data-stash-drawer>
+  <div class="stash-drawer__panel">
+    <div class="stash-drawer__header">
+      <h2 id="StashDrawerTitle" class="stash-drawer__title">{{ 'cart.title' | t }}</h2>
+      <button type="button" class="icon-button" data-stash-close>
+        {% render 'icon', icon: 'close' %}
+        <span class="visually-hidden">{{ 'general.close' | t }}</span>
+      </button>
+    </div>
+
+    <div class="stash-drawer__contents" data-stash-contents data-item-count="{{ cart.item_count }}">
+      {%- if cart.item_count == 0 -%}
+        <div class="stash-drawer__empty">
+          <p class="balloon">{{ 'cart.empty' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">{{ 'cart.empty_cta' | t }}</a>
+        </div>
+      {%- else -%}
+        <ul class="stash-items" role="list">
+          {%- for item in cart.items -%}
+            <li class="stash-item">
+              <a href="{{ item.url }}" class="stash-item__image" tabindex="-1" aria-hidden="true">
+                {%- if item.image -%}
+                  {{
+                    item.image
+                    | image_url: width: 200
+                    | image_tag: loading: 'lazy', widths: '100, 200', sizes: '88px', alt: ''
+                  }}
+                {%- else -%}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </a>
+              <div class="stash-item__info">
+                <a href="{{ item.url }}" class="stash-item__title">{{ item.product.title | escape }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="stash-item__variant">{{ item.variant.title | escape }}</p>
+                {%- endunless -%}
+                <p class="stash-item__price">{{ item.final_line_price | money }}</p>
+                <div class="stash-item__actions">
+                  <div class="qty" role="group" aria-label="{{ 'cart.quantity' | t }}">
+                    <button
+                      type="button"
+                      class="qty__button"
+                      data-stash-line="{{ forloop.index }}"
+                      data-stash-quantity="{{ item.quantity | minus: 1 }}"
+                    >
+                      {% render 'icon', icon: 'minus' %}
+                      <span class="visually-hidden">{{ 'cart.decrease' | t: title: item.product.title }}</span>
+                    </button>
+                    <span class="qty__value">{{ item.quantity }}</span>
+                    <button
+                      type="button"
+                      class="qty__button"
+                      data-stash-line="{{ forloop.index }}"
+                      data-stash-quantity="{{ item.quantity | plus: 1 }}"
+                    >
+                      {% render 'icon', icon: 'plus' %}
+                      <span class="visually-hidden">{{ 'cart.increase' | t: title: item.product.title }}</span>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    class="link-button"
+                    data-stash-line="{{ forloop.index }}"
+                    data-stash-quantity="0"
+                  >
+                    <span aria-hidden="true">{{ 'cart.remove_short' | t }}</span>
+                    <span class="visually-hidden">{{ 'cart.remove' | t: title: item.product.title }}</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="stash-drawer__footer">
+          <p class="stash-drawer__subtotal">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <span>{{ cart.total_price | money_with_currency }}</span>
+          </p>
+          <p class="stash-drawer__note">{{ 'cart.taxes_note' | t }}</p>
+          <form action="{{ routes.cart_url }}" method="post" class="stash-drawer__checkout">
+            <button type="submit" name="checkout" class="btn btn--primary btn--block">
+              {{ 'cart.checkout' | t }}
+            </button>
+          </form>
+          <a href="{{ routes.cart_url }}" class="stash-drawer__view">{{ 'cart.view_cart' | t }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <p class="visually-hidden" role="status" aria-live="polite" data-stash-status></p>
+  </div>
+</dialog>
+
+{% schema %}
+{
+  "name": "Stash drawer",
+  "settings": []
+}
+{% endschema %}

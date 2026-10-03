@@ -1,0 +1,161 @@
+{%- liquid
+  assign has_social = false
+  if settings.social_instagram_link != blank or settings.social_tiktok_link != blank or settings.social_youtube_link != blank
+    assign has_social = true
+  endif
+-%}
+
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'fan_club' -%}
+          <div class="site-footer__block site-footer__block--fan-club panel panel--violet" {{ block.shopify_attributes }}>
+            {%- if block.settings.heading != blank -%}
+              <h2 class="site-footer__heading">{{ block.settings.heading | escape }}</h2>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="site-footer__text">{{ block.settings.text }}</div>
+            {%- endif -%}
+            {%- assign fan_form_id = 'FanClubFooter-' | append: block.id -%}
+            {% render 'fan-club-form', form_id: fan_form_id %}
+          </div>
+
+        {%- when 'menu' -%}
+          <div class="site-footer__block" {{ block.shopify_attributes }}>
+            {%- if block.settings.heading != blank -%}
+              <h2 class="site-footer__heading">{{ block.settings.heading | escape }}</h2>
+            {%- endif -%}
+            {%- if block.settings.menu.links.size > 0 -%}
+              <ul class="site-footer__links" role="list">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+
+        {%- when 'text' -%}
+          <div class="site-footer__block" {{ block.shopify_attributes }}>
+            {%- if block.settings.heading != blank -%}
+              <h2 class="site-footer__heading">{{ block.settings.heading | escape }}</h2>
+            {%- endif -%}
+            <div class="site-footer__text">{{ block.settings.text }}</div>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+  <div class="container site-footer__bottom">
+    {%- if has_social -%}
+      <ul class="social-links" role="list" aria-label="{{ 'footer.social' | t }}">
+        {%- if settings.social_instagram_link != blank -%}
+          <li>
+            <a href="{{ settings.social_instagram_link }}" class="icon-button" rel="noopener" target="_blank">
+              {% render 'icon', icon: 'instagram' %}<span class="visually-hidden">Instagram</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if settings.social_tiktok_link != blank -%}
+          <li>
+            <a href="{{ settings.social_tiktok_link }}" class="icon-button" rel="noopener" target="_blank">
+              {% render 'icon', icon: 'tiktok' %}<span class="visually-hidden">TikTok</span>
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if settings.social_youtube_link != blank -%}
+          <li>
+            <a href="{{ settings.social_youtube_link }}" class="icon-button" rel="noopener" target="_blank">
+              {% render 'icon', icon: 'youtube' %}<span class="visually-hidden">YouTube</span>
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+      <ul class="payment-icons" role="list" aria-label="{{ 'footer.payment' | t }}">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- assign current_year = 'now' | date: '%Y' -%}
+    <p class="site-footer__copyright">{{ 'footer.copyright' | t: year: current_year, shop: shop.name }}</p>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "enabled_on": { "groups": ["footer"] },
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "fan_club",
+      "name": "Fan club signup",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Join the fan club"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Early access to every new issue, before it hits the shelves.</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Help"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About Noviko"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Streetwear printed from original comic art. Every drop is a new issue.</p>"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

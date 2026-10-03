@@ -1,0 +1,37 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "fan_club": {
+          "type": "fan_club",
+          "settings": {
+            "heading": "Join the fan club",
+            "text": "<p>Early access to every new issue, before it hits the shelves.</p>"
+          }
+        },
+        "menu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Help",
+            "menu": "footer"
+          }
+        },
+        "about": {
+          "type": "text",
+          "settings": {
+            "heading": "About Noviko",
+            "text": "<p>Streetwear printed from original comic art. Every drop is a new issue.</p>"
+          }
+        }
+      },
+      "block_order": ["fan_club", "menu", "about"],
+      "settings": {
+        "show_payment_icons": true
+      }
+    }
+  },
+  "order": ["footer"]
+}

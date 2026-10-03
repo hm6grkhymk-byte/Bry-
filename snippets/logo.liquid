@@ -1,0 +1,37 @@
+{%- comment -%}
+  The NOVIKO logo. Uses the uploaded logo from Theme settings > Logo, or a
+  lettered wordmark when none is uploaded yet.
+  Params: class (optional), size ('header' or 'hero')
+{%- endcomment -%}
+{%- liquid
+  assign logo_classes = 'logo'
+  if settings.logo_misregistration
+    assign logo_classes = logo_classes | append: ' misregister'
+  endif
+  if class
+    assign logo_classes = logo_classes | append: ' ' | append: class
+  endif
+-%}
+{%- if settings.logo != blank -%}
+  {%- liquid
+    if size == 'hero'
+      assign logo_widths = '400, 600, 800, 1000'
+      assign logo_sizes = '(min-width: 750px) 480px, 80vw'
+    else
+      assign logo_widths = '150, 300, 450, 600'
+      assign logo_sizes = settings.logo_width | append: 'px'
+    endif
+  -%}
+  {{
+    settings.logo
+    | image_url: width: 1000
+    | image_tag:
+      class: logo_classes,
+      alt: shop.name,
+      widths: logo_widths,
+      sizes: logo_sizes,
+      loading: 'eager'
+  }}
+{%- else -%}
+  <span class="{{ logo_classes }} logo--text">{{ shop.name | escape }}</span>
+{%- endif -%}

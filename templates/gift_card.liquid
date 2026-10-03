@@ -1,0 +1,32 @@
+{%- layout none -%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ 'gift_cards.title' | t }} – {{ shop.name }}</title>
+    {% render 'theme-styles' %}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ content_for_header }}
+  </head>
+  <body class="has-halftone">
+    <main class="section">
+      <div class="container">
+        <div class="panel page-panel" style="text-align:center">
+          <p>{% render 'logo', size: 'hero' %}</p>
+          <h1>{{ 'gift_cards.title' | t }}</h1>
+          <p class="burst" style="--burst-fill: var(--magenta); width: 10rem; margin: 0 auto var(--space-4);">{{ gift_card.initial_value | money }}</p>
+          {%- if gift_card.balance != gift_card.initial_value -%}
+            {%- assign balance = gift_card.balance | money -%}
+            <p>{{ 'gift_cards.balance' | t: value: balance }}</p>
+          {%- endif -%}
+          <p class="caption-box">{{ 'gift_cards.code' | t }}: {{ gift_card.code | format_code }}</p>
+          <p>
+            <a href="{{ shop.url }}" class="btn btn--primary">{{ 'gift_cards.shop' | t }}</a>
+            <button type="button" class="btn" onclick="window.print()">{{ 'gift_cards.print' | t }}</button>
+          </p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

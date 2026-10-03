@@ -1,0 +1,17 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_ink": "#000000",
+      "color_paper": "#FFFFFF",
+      "color_yellow": "#FFE14D",
+      "color_magenta": "#FF2E88",
+      "color_cyan": "#00B4E6",
+      "color_violet": "#6B5CE7",
+      "logo_width": 150,
+      "logo_misregistration": true,
+      "halftone_background": true,
+      "sfx_words": "BAM!, ZAP!, POW!, KAPOW!, WHAM!"
+    }
+  }
+}

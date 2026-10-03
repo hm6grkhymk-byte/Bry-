@@ -1,0 +1,77 @@
+{%- comment -%}
+  Full cart page. Most shoppers use the slide-out stash drawer instead; this
+  page is the no-JavaScript fallback and the "View full stash" link.
+{%- endcomment -%}
+<section class="section">
+  <div class="container">
+    <div class="panel page-panel">
+      <h1>{{ 'cart.title' | t }}</h1>
+      {%- if cart.item_count == 0 -%}
+        <p class="balloon">{{ 'cart.empty' | t }}</p>
+        <p><a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">{{ 'cart.empty_cta' | t }}</a></p>
+      {%- else -%}
+        <form action="{{ routes.cart_url }}" method="post" class="cart-page">
+          <ul class="stash-items cart-page__items" role="list">
+            {%- for item in cart.items -%}
+              <li class="stash-item">
+                <a href="{{ item.url }}" class="stash-item__image" tabindex="-1" aria-hidden="true">
+                  {%- if item.image -%}
+                    {{ item.image | image_url: width: 200 | image_tag: loading: 'lazy', widths: '100, 200', sizes: '88px', alt: '' }}
+                  {%- else -%}
+                    {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </a>
+                <div class="stash-item__info">
+                  <a href="{{ item.url }}" class="stash-item__title">{{ item.product.title | escape }}</a>
+                  {%- unless item.product.has_only_default_variant -%}
+                    <p class="stash-item__variant">{{ item.variant.title | escape }}</p>
+                  {%- endunless -%}
+                  <p class="stash-item__price">{{ item.final_line_price | money }}</p>
+                  <div class="stash-item__actions">
+                    <label class="visually-hidden" for="Updates-{{ forloop.index }}">{{ 'cart.quantity' | t }}</label>
+                    <input
+                      id="Updates-{{ forloop.index }}"
+                      class="field cart-page__qty"
+                      type="number"
+                      name="updates[]"
+                      value="{{ item.quantity }}"
+                      min="0"
+                      inputmode="numeric"
+                    >
+                    <a href="{{ item.url_to_remove }}" class="link-button">
+                      <span aria-hidden="true">{{ 'cart.remove_short' | t }}</span>
+                      <span class="visually-hidden">{{ 'cart.remove' | t: title: item.product.title }}</span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          <p class="stash-drawer__subtotal">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <span>{{ cart.total_price | money_with_currency }}</span>
+          </p>
+          <p class="stash-drawer__note">{{ 'cart.taxes_note' | t }}</p>
+          <div class="cart-page__buttons">
+            <button type="submit" name="update" class="btn">{{ 'cart.update' | t }}</button>
+            <button type="submit" name="checkout" class="btn btn--primary">{{ 'cart.checkout' | t }}</button>
+          </div>
+        </form>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .cart-page__items { padding: 0; margin-bottom: var(--space-5); }
+  .cart-page__qty { width: 5.5rem; min-height: 44px; }
+  .cart-page__buttons { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: flex-end; }
+</style>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": []
+}
+{% endschema %}

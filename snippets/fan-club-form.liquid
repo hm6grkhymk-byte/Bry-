@@ -1,0 +1,48 @@
+{%- comment -%}
+  Fan club email signup. Saves the email as a Shopify customer with
+  marketing consent, tagged so you can find fan club members in the admin.
+  TODO (see TODO.md): swap for a Klaviyo form once the email provider is chosen.
+
+  Params:
+  - form_id: unique id for this form on the page (required)
+  - tags: comma separated customer tags (optional, default 'newsletter, fan-club')
+  - button_label: optional override for the button text
+{%- endcomment -%}
+{%- liquid
+  assign customer_tags = tags | default: 'newsletter, fan-club'
+  assign label = button_label
+  if label == blank
+    assign label = 'newsletter.submit' | t
+  endif
+-%}
+{%- form 'customer', id: form_id, class: 'fan-club-form' -%}
+  <input type="hidden" name="contact[tags]" value="{{ customer_tags | escape }}">
+  {%- if form.posted_successfully? -%}
+    <p class="fan-club-form__success caption-box" role="status" tabindex="-1" autofocus>
+      {{ 'newsletter.success' | t }}
+    </p>
+  {%- else -%}
+    <div class="fan-club-form__row">
+      <label class="visually-hidden" for="{{ form_id }}-email">{{ 'newsletter.label' | t }}</label>
+      <input
+        id="{{ form_id }}-email"
+        class="field"
+        type="email"
+        name="contact[email]"
+        value="{{ form.email }}"
+        placeholder="{{ 'newsletter.placeholder' | t }}"
+        autocomplete="email"
+        autocorrect="off"
+        autocapitalize="off"
+        required
+        {% if form.errors %}
+          aria-invalid="true" aria-describedby="{{ form_id }}-error"
+        {% endif %}
+      >
+      <button type="submit" class="btn btn--primary">{{ label | escape }}</button>
+    </div>
+    {%- if form.errors -%}
+      <p class="form-error" id="{{ form_id }}-error">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>
+    {%- endif -%}
+  {%- endif -%}
+{%- endform -%}

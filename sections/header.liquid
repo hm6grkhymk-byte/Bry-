@@ -1,0 +1,115 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign is_home = false
+  if request.page_type == 'index'
+    assign is_home = true
+  endif
+-%}
+
+<header class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}">
+  <div class="site-header__inner container">
+    {%- if menu.links.size > 0 -%}
+      <details class="menu-drawer" data-menu-drawer>
+        <summary class="icon-button menu-drawer__toggle">
+          {% render 'icon', icon: 'menu' %}
+          <span class="visually-hidden">{{ 'general.menu' | t }}</span>
+        </summary>
+        <nav class="menu-drawer__panel panel" aria-label="{{ 'header.main_menu' | t }}">
+          <ul class="menu-drawer__list" role="list">
+            {%- for link in menu.links -%}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  class="menu-drawer__link"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- link.title | escape -}}
+                </a>
+                {%- if link.links.size > 0 -%}
+                  <ul class="menu-drawer__sublist" role="list">
+                    {%- for child in link.links -%}
+                      <li>
+                        <a
+                          href="{{ child.url }}"
+                          {% if child.current %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          {{- child.title | escape -}}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      </details>
+    {%- endif -%}
+
+    {%- if is_home -%}<h1 class="site-header__brand">{%- else -%}<div class="site-header__brand">{%- endif -%}
+    <a href="{{ routes.root_url }}" class="site-header__logo-link">
+      {%- render 'logo', size: 'header' -%}
+    </a>
+    {%- if is_home -%}</h1>{%- else -%}</div>{%- endif -%}
+
+    {%- if menu.links.size > 0 -%}
+      <nav class="site-nav" aria-label="{{ 'header.main_menu' | t }}">
+        <ul class="site-nav__list" role="list">
+          {%- for link in menu.links -%}
+            <li>
+              <a
+                href="{{ link.url }}"
+                class="site-nav__link"
+                {% if link.current or link.child_active %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- link.title | escape -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <a
+      href="{{ routes.cart_url }}"
+      class="stash-button"
+      data-stash-open
+      aria-haspopup="dialog"
+      aria-controls="StashDrawer"
+    >
+      {% render 'icon', icon: 'stash' %}
+      <span class="stash-button__label" aria-hidden="true">{{ 'header.stash' | t }}</span>
+      <span class="stash-button__count" data-stash-count aria-hidden="true">{{ cart.item_count }}</span>
+      <span class="visually-hidden" data-stash-count-label>{{ 'header.stash_label' | t: count: cart.item_count }}</span>
+    </a>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "Edit this in Online Store > Navigation."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Keep header on screen while scrolling",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

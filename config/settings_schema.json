@@ -1,0 +1,141 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Noviko",
+    "theme_version": "0.1.0",
+    "theme_author": "Noviko",
+    "theme_documentation_url": "https://github.com/hm6grkhymk-byte/Bry-",
+    "theme_support_url": "https://github.com/hm6grkhymk-byte/Bry-"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The comic print palette. Change these only if the brand colors change."
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink (outlines and text)",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "color_paper",
+        "label": "Paper (panels)",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_yellow",
+        "label": "Ben-Day yellow (page background)",
+        "default": "#FFE14D"
+      },
+      {
+        "type": "color",
+        "id": "color_magenta",
+        "label": "Magenta (main buttons, halftone dots)",
+        "default": "#FF2E88"
+      },
+      {
+        "type": "color",
+        "id": "color_cyan",
+        "label": "Cyan (secondary buttons, focus rings)",
+        "default": "#00B4E6"
+      },
+      {
+        "type": "color",
+        "id": "color_violet",
+        "label": "Night violet (dark panels, sealed issues)",
+        "default": "#6B5CE7"
+      }
+    ]
+  },
+  {
+    "name": "Logo",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo",
+        "info": "SVG or PNG with a transparent background. Leave empty to use the lettered NOVIKO wordmark."
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 80,
+        "max": 300,
+        "step": 10,
+        "unit": "px",
+        "label": "Logo width in the header",
+        "default": 150
+      },
+      {
+        "type": "checkbox",
+        "id": "logo_misregistration",
+        "label": "Show CMYK misregistration on the logo",
+        "info": "Adds the offset cyan and magenta printing effect behind the logo.",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Square image, at least 64 × 64px."
+      }
+    ]
+  },
+  {
+    "name": "Comic effects",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "halftone_background",
+        "label": "Halftone dots on the page background",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "sfx_words",
+        "label": "Sound effects when adding to stash",
+        "info": "Separate with commas. One is picked at random each time.",
+        "default": "BAM!, ZAP!, POW!, KAPOW!, WHAM!"
+      }
+    ]
+  },
+  {
+    "name": "Social sharing",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "share_image",
+        "label": "Default share image",
+        "info": "Shown when a page is shared on social media and has no image of its own. Use the current issue cover, 1200 × 630px."
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/noviko"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "TikTok",
+        "info": "https://tiktok.com/@noviko"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "YouTube",
+        "info": "https://youtube.com/@noviko"
+      }
+    ]
+  }
+]

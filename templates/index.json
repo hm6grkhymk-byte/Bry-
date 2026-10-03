@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "cover": {
+      "type": "cover",
+      "settings": {
+        "corner_top": "No. 1",
+        "corner_bottom": "Vol. 1",
+        "balloon": "You picked the right comic.",
+        "burst": "First issue!",
+        "caption": "Meanwhile, in a city drawn in ink…",
+        "kicker": "Issue #1",
+        "heading": "Origin Story",
+        "text": "<p>Every drop is a new issue. Read the story, pick your panel, wear the comic.</p>",
+        "button_1_label": "Read Issue #1",
+        "button_1_link": "",
+        "button_2_label": "Shop the tees",
+        "button_2_link": "/collections/all"
+      }
+    }
+  },
+  "order": ["cover"]
+}

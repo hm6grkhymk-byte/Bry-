@@ -1,0 +1,108 @@
+{
+  "general": {
+    "skip_to_content": "Skip to content",
+    "menu": "Menu",
+    "close": "Close",
+    "home": "Home",
+    "continue_reading": "Continue reading",
+    "placeholder_art": "Art coming soon"
+  },
+  "header": {
+    "stash": "Stash",
+    "stash_label": {
+      "one": "Your stash, {{ count }} item",
+      "other": "Your stash, {{ count }} items"
+    },
+    "main_menu": "Main menu"
+  },
+  "cart": {
+    "title": "Your stash",
+    "empty": "Your stash is empty. Every hero needs gear.",
+    "empty_cta": "Raid the longbox",
+    "subtotal": "Subtotal",
+    "taxes_note": "Shipping and taxes calculated at checkout.",
+    "checkout": "Check out",
+    "view_cart": "View full stash",
+    "remove": "Remove {{ title }}",
+    "remove_short": "Remove",
+    "quantity": "Quantity",
+    "increase": "Add one more {{ title }}",
+    "decrease": "Remove one {{ title }}",
+    "added": "{{ title }} added to your stash.",
+    "updated": "Stash updated.",
+    "update": "Update stash",
+    "error": "Something went wrong. Please try again.",
+    "item_count": {
+      "one": "{{ count }} item",
+      "other": "{{ count }} items"
+    },
+    "continue_shopping": "Keep shopping"
+  },
+  "products": {
+    "add_to_stash": "Add to stash",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "regular_price": "Regular price",
+    "sale_price": "Sale price",
+    "from_price": "From {{ price }}",
+    "choose_option": "Choose {{ option }}"
+  },
+  "collections": {
+    "empty": "No gear in this box yet. Check back soon.",
+    "product_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    }
+  },
+  "newsletter": {
+    "label": "Email address",
+    "placeholder": "you@email.com",
+    "submit": "Join",
+    "success": "You're in the fan club! Watch your inbox for the next issue."
+  },
+  "footer": {
+    "social": "Follow Noviko",
+    "payment": "Payment methods",
+    "copyright": "© {{ year }} {{ shop }}. All characters and art are original."
+  },
+  "not_found": {
+    "title": "Wrong universe",
+    "text": "This page doesn't exist in our comic. Let's get you back to the cover.",
+    "cta": "Back to the cover"
+  },
+  "search": {
+    "title": "Search",
+    "label": "Search the store",
+    "submit": "Search",
+    "results": {
+      "one": "{{ count }} result for “{{ terms }}”",
+      "other": "{{ count }} results for “{{ terms }}”"
+    },
+    "no_results": "Nothing found for “{{ terms }}”. Try another word."
+  },
+  "blogs": {
+    "read_more": "Read more",
+    "back": "Back to {{ title }}"
+  },
+  "password": {
+    "title": "Coming soon",
+    "enter": "Enter with password",
+    "password_label": "Password",
+    "submit": "Enter",
+    "owner": "Are you the store owner?",
+    "login": "Log in here"
+  },
+  "gift_cards": {
+    "title": "Your gift card",
+    "code": "Gift card code",
+    "balance": "Balance: {{ value }}",
+    "print": "Print",
+    "shop": "Start shopping"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {{ number }}"
+  }
+}

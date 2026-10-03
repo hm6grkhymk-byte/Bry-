@@ -1,0 +1,25 @@
+{%- comment -%}
+  "Wrong universe" 404. Character art is added in build step 6.
+{%- endcomment -%}
+<section class="section">
+  <div class="container">
+    <div class="panel page-panel not-found">
+      <p class="burst not-found__burst" aria-hidden="true">404</p>
+      <h1>{{ 'not_found.title' | t }}</h1>
+      <p class="balloon">{{ 'not_found.text' | t }}</p>
+      <p><a href="{{ routes.root_url }}" class="btn btn--primary">{{ 'not_found.cta' | t }}</a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .not-found { text-align: center; }
+  .not-found__burst { width: 9rem; font-size: 2rem; margin: 0 auto var(--space-4); --burst-fill: var(--magenta); }
+</style>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": []
+}
+{% endschema %}

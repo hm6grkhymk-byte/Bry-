@@ -1,0 +1,6 @@
+root: .
+extends: theme-check:recommended
+ignore:
+  - node_modules/*
+  - docs/*
+  - preview/*

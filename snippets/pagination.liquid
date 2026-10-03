@@ -1,0 +1,11 @@
+{%- comment -%} Params: paginate (required) {%- endcomment -%}
+{%- if paginate.pages > 1 -%}
+  <nav class="pagination" aria-label="{{ 'pagination.label' | t }}">
+    {%- if paginate.previous -%}
+      <a href="{{ paginate.previous.url }}" class="btn">{{ 'pagination.previous' | t }}</a>
+    {%- endif -%}
+    {%- if paginate.next -%}
+      <a href="{{ paginate.next.url }}" class="btn">{{ 'pagination.next' | t }}</a>
+    {%- endif -%}
+  </nav>
+{%- endif -%}
