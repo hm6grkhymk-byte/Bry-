@@ -62,7 +62,7 @@ for (const vp of [SE, ANDROID, PROMAX, DESKTOP]) {
 
 // Screenshots
 const shots = [
-  ['index.html', SE, 'home-iphone-se'], ['index.html', PROMAX, 'home-iphone-pro-max'], ['index.html', DESKTOP, 'home-desktop'],
+  ['home.html', SE, 'home-iphone-se'], ['home.html', PROMAX, 'home-iphone-pro-max'], ['home.html', DESKTOP, 'home-desktop'],
   ['collections.html', SE, 'issues-phone', true], ['collections.html', DESKTOP, 'issues-desktop'],
   ['issue-1.html', SE, 'issue-1-phone', true], ['issue-1.html', DESKTOP, 'issue-1-desktop', true],
   ['issue-2.html', SE, 'issue-2-sealed-phone'],
@@ -150,7 +150,7 @@ for (const [f, vp, name, full] of shots) {
 
 // Flow 5: keyboard — stash opens from keyboard, Escape closes, focus returns
 {
-  const page = await open(SE, 'index.html');
+  const page = await open(SE, 'home.html');
   await page.focus('[data-stash-open]');
   await page.keyboard.press('Enter'); await page.waitForTimeout(400);
   const opened = await page.evaluate(() => document.querySelector('[data-stash-drawer]').open);

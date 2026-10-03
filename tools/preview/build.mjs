@@ -97,7 +97,7 @@ async function renderGroup(name, globals) {
 
 /* ---------- URL map: Shopify paths -> preview files ---------- */
 const urlMap = {
-  '/': 'index.html',
+  '/': 'home.html',
   '/collections': 'collections.html',
   '/collections/all': 'longbox.html',
   '/cart': 'cart.html',
@@ -173,7 +173,7 @@ async function renderPage(file, { template, suffix, layout = 'theme', ...objects
   if (missing) console.warn(file, 'missing translations:', [...new Set(missing)]);
 }
 
-await renderPage('index.html', { template: 'index', title: 'Noviko' });
+await renderPage('home.html', { template: 'index', title: 'Noviko' });
 await renderPage('collections.html', { template: 'list-collections', title: 'Pick your issue' });
 await renderPage('issue-1.html', { template: 'collection', suffix: 'issue', collection: data.issue1, title: 'Issue #1: Origin Story' });
 await renderPage('issue-2.html', { template: 'collection', suffix: 'issue', collection: data.issue2, title: 'Issue #2' });
@@ -189,6 +189,8 @@ await renderPage('404.html', { template: '404', title: 'Wrong universe' });
 await renderPage('coming-soon.html', { template: 'password', title: 'Coming soon' });
 
 /* ---------- Static files ---------- */
+// The artifact's landing page: a short lobby that links into the store.
+fs.copyFileSync(path.join(HERE, 'lobby.html'), path.join(OUT, 'index.html'));
 for (const f of fs.readdirSync(path.join(THEME, 'assets'))) fs.copyFileSync(path.join(THEME, 'assets', f), path.join(OUT, 'assets', f));
 for (const [p, svg] of Object.entries(data.files)) fs.writeFileSync(path.join(OUT, p), svg);
 fs.copyFileSync(path.join(HERE, 'shim.js'), path.join(OUT, 'preview-shim.js'));

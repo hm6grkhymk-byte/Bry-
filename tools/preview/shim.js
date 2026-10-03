@@ -24,7 +24,8 @@
     if (enginePromise) return enginePromise;
     enginePromise = (async () => {
       const [{ Liquid, Tag, Hash }, { registerShopify }, data] = await Promise.all([
-        import('./liquid.browser.mjs'),
+        // Published preview loads liquidjs from the CDN; local runs fall back to the bundled copy.
+        import('https://cdn.jsdelivr.net/npm/liquidjs@10.30.0/dist/liquid.browser.mjs').catch(() => import('./liquid.browser.mjs')),
         import('./preview-filters.mjs'),
         getData(),
       ]);
@@ -197,7 +198,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const banner = document.createElement('div');
     banner.className = 'preview-banner';
-    banner.innerHTML = 'PREVIEW · sample products &amp; placeholder art · cart works, checkout &amp; signups are simulated';
+    banner.innerHTML = 'PREVIEW · sample products &amp; placeholder art · checkout &amp; signups are simulated · <a href="index.html">All preview pages</a>';
     document.body.prepend(banner);
 
     const lines = loadCart();
